@@ -1,7 +1,7 @@
 # Machine_Learning
 Learning machine learning
 # Steps
-Import the Data/
+Import the Data/n
 Clean the Data/
 Split the Data into Training(Input)/ Test(Output) Sets(80/20, 70/30)/
 Create a Model/
