@@ -35,7 +35,7 @@ def prime(num):
 num = int(input("Enter a number: "))  # You can change this value to test other numbers
 prime(num)   
 
-print("Hello, World!")
+print("Hello, \n World!")
 
 name = input("Enter your name: ")
 
