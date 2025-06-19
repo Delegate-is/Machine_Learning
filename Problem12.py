@@ -36,8 +36,8 @@ def generate_star_pattern():
 if __name__ == "__main__":
     generate_star_pattern()
 
-for i in range(6): #0,1,2,3,4,5
+for i in range(7): #0,1,2,3,4,5
     for j in range(i-1):
-        print("*", end=" ")
+        print(str(i)+"*"+str(j), end=" ")
     print("")
     
