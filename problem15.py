@@ -17,5 +17,8 @@ for i in range(6):
 Tupl = tuple(temp_list)
 print(Tupl)
 print("Sum: " + str(sum(Tupl)))
-Tupl.clear()
+# Tuples are immutable and do not have a clear() method
+# To "clear" a tuple, you can assign an empty tuple if needed
+Tupl = ()
+print("We have assigned an empty tuple to Tupl")
 print(Tupl)
