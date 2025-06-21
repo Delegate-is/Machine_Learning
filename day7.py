@@ -3,6 +3,7 @@ print("hello \nworld!")
 print("hello  \b\b world!")
 print("hello \\\ world!")
 print("hello \ world!")
+print("hello\b world")
 
 print("Hello, Python!")
 
