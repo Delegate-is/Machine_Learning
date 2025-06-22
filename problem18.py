@@ -9,3 +9,6 @@ print(user_dict)
 user_dict.update({"Contact": int(input("Enter a number:"))})
 print("Updated Record Again, this time by User during run time")
 print(user_dict)
+
+print(2+3)
+print('2+3')
