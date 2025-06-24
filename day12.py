@@ -65,3 +65,17 @@ print('value'+" "+str(123))
 v1 = 100
 v2 = 'Age'
 print(str(v1)+" "+v2)
+print("\n")
+print("Reasons why Python is considered Great.")
+
+print("Easy to read and write.")
+
+print("Python has a robust community")
+
+print("Python has many libraries to use in various scenarios such as web development and AI")
+
+print("Python is easy to use since it require small code chunks to run a program")
+
+print("Python has a less complex syntax that allows creation of robust programs efficiently and in less time") 
+
+

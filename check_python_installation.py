@@ -46,3 +46,5 @@ def check_python_installation():
 if __name__ == "__main__":
     check_python_installation()
 
+# python -m venv venv===create a new venv folder containing the necessary Python binaries and scripts
+# .\venv\Scripts\Activate.ps1 ---activate virtual env
