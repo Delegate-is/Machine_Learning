@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <section style="background-color: var(--light); padding: 50px 0; text-align: center;">
+        <h1>Fresh Farm Produce Direct From Kenyan Farmers</h1>
+        <p>Buy potatoes, bananas, legumes and more at competitive prices</p>
+        <a href="{{ url_for('market') }}" class="btn btn-primary">Browse Market</a>
+    </section>
+
+    <section style="margin: 50px 0;">
+        <h2>Featured Products</h2>
+        <div class="products-grid">
+            {% for product in products %}
+                <div class="card">
+                    {% if product.image %}
+                        <img src="{{ url_for('static', filename='uploads/' + product.image) }}" alt="{{ product.name }}" class="card-img">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='images/default-product.jpg') }}" alt="{{ product.name }}" class="card-img">
+                    {% endif %}
+                    <div class="card-body">
+                        <h3 class="card-title">{{ product.name }}</h3>
+                        <p>{{ product.category|capitalize }}</p>
+                        <p>KSh {{ "%.2f"|format(product.price) }}</p>
+                        <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+{% endblock %}
