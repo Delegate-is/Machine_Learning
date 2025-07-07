@@ -12,3 +12,5 @@ print("List of students in descending order:, str(student_list)")
 for d in student_list:
     print("Student name in descending order:", d)
 student_list.pop()  # Remove the last student
+student_list.pop(0)  # Remove the first student
+print("List of students after removing the last student:", str(student_list))
