@@ -1,0 +1,20 @@
+# Get name from user, marks, username, subjects and store in array
+import array as arr
+
+user = input("Enter your name: ")
+a = arr.array('i',[])
+for i in range(5):
+    a.append(int(input("Enter subject marks in order English, AI, Physics, Computer, Math "+str({i+1}))))
+total = 0
+for i in range(5):
+    total += a[i]
+    average = total / 5
+print(f"Hi {user}!")
+print("Total marks "+str(total))
+print("See all your subject marks")
+print("English = "+str(a[0]))
+print("AI = "+str(a[1]))
+print("Physics = "+str(a[2]))
+print("Computer = "+str(a[3]))
+print("Math = "+str(a[4]))
+print("Your marks average is = "+str(average))
