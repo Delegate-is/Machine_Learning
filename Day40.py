@@ -32,3 +32,13 @@ if user_name.isalnum() and (len(user_name) == 8 or len(user_name) < 20):
     print("User name "+str(user_name)+" is valid.")
 else:
     print("Username is invalid")
+    
+def print_multiples(number, limit):
+    for i in range(1, limit+1):
+        mult = number * i
+        print(mult)
+        i += 1
+n1 = int(input("Enter a number: "))
+n2 = int(input("Enter a Limit Value: "))
+print("Multiples of "+str(n1)+" up to", str(n2))
+print_multiples(n1,n2)
