@@ -64,3 +64,10 @@ if __name__ == "__main__":
     }
     total_len1 = calculate_total_length_of_dict_elements(dict1)
     print(f"Total length of keys and values in dict1: {total_len1}\n")
+
+n1 = int(input("Enter a number: "))
+n2 = int(input("Enter a number: "))
+if n1 > n2:
+    print("n1 is the max number")
+else:
+    print("n2 is the max number")
