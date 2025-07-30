@@ -39,3 +39,30 @@ total_char = len(j)
 for n in range(0, total_char):
     if n % 2 == 0:
         print(j[n], end="")
+
+"""list= [a, b]
+a = int(input("Enter first element: "))
+b = int(input("Enter second element: "))
+list.sum = a + b
+print("Sum of the elements in the list:", sum(list))
+list.product = a * b
+print("Product of the elements in the list:", a * b)
+list.difference = a - b
+print("Difference of the elements in the list:", a - b)
+list.quotient = a / b
+print("Quotient of the elements in the list:", a / b)
+"""
+# Input 2 numbers separated by space and display the sum, product, difference, and quotient
+def calculate_operations(a, b):
+    return {
+        'sum': a + b,
+        'product': a * b,
+        'difference': a - b,
+        'quotient': a / b if b != 0 else 'undefined (division by zero)'
+    }
+a, b = map(int, input("Enter two numbers separated by space: ").split())
+operations = calculate_operations(a, b)
+print("Sum:", operations['sum'])
+print("Product:", operations['product'])
+print("Difference:", operations['difference'])
+print("Quotient:", operations['quotient'])
