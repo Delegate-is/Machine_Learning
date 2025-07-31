@@ -138,3 +138,12 @@ print(str.title())  # "Hello, World!"
 # CAPITALIZE - convert str to capitalized case
 str = "hello, world!"
 print(str.capitalize())  # "Hello, world!"
+
+str_2 = "hello, world!"
+print(len(str_2))  # Length of the string
+print(str_2.upper())  # Convert to upper case
+print(str_2.lower())  # Convert to lower case
+print(str_2.count('o'))  # Count occurrences of 'o'
+print(str_2.find('o'))  # Find first occurrence of 'o'
+print(str_2.replace('o', 'a'))  # Replace 'o' with 'a'
+print(str_2.split(','))  # Split string by comma
