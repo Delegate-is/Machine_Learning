@@ -41,3 +41,16 @@ s = "hello, world!"
 print(s.title())  # "Hello, World!"
 str = "maxi codeweb"
 print(str.title())  # "Maxi Codeweb"
+# String method isspace() - check whether a string contains only whitespace characters
+s = "   "
+print(s.isspace())  # True, contains only whitespace characters 
+str = "   abcde   "
+print(str.isspace())  # False, contains alphabetic characters and whitespace
+str_2 = input("Enter a string: ")
+print(len(str_2))  # Print the length of the input string
+print(str_2.title())  # Convert the input string to title case
+print(str_2.index(str_2[0]))  # Find the index of the first character in the input string
+if str_2.endswith("!"):
+    print(str_2 + " is a great string!")  # If the input string ends with '!', print a message
+else:
+    print(str_2 + " is not a great string!")
