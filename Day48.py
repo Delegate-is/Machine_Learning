@@ -24,3 +24,25 @@ word_to_replace = input("Enter the word to replace: ")
 replacement_word = input("Enter the replacement word: ")
 modified_sentence = sentence.replace(word_to_replace, replacement_word)
 print(f"Modified sentence: {modified_sentence}")  # Display the modified sentence
+str_3 = " "
+if str_3.isspace():
+    print("The string contains whitespace characters.")
+else:
+    print("The string does not contain whitespace characters.")
+    # Get 3 marks from user and find total, average and percentage
+sum = 0
+for i in range(3):
+    mark = int(input(f"Enter mark {i+1}: "))
+    sum += mark
+total = sum
+average = total / 3
+percentage = (total / 3) * 100
+print(f"Total: {total}, Average: {average}, Percentage: {percentage}%")
+# Enter 3 numbers seperated by space and find the largest number and smallest plus average
+numbers = input("Enter three numbers separated by space: ")
+numbers_list = list(map(int, numbers.split()))
+largest = max(numbers_list)
+smallest = min(numbers_list)
+total = sum(numbers_list)
+average = total / len(numbers_list)
+print(f"Largest: {largest}, Smallest: {smallest}, Average: {average}")

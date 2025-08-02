@@ -22,3 +22,21 @@ print(add(a,b,c))
 x = int(input("Enter a number: "))
 square = lambda x: x * x
 print(square(x))
+# Enter 3 numbers seperated by space and find the largest number and smallest plus average
+numbers = input("Enter three numbers separated by space: ")
+numbers_list = list(map(int, numbers.split()))
+largest = max(numbers_list)
+smallest = min(numbers_list)
+total = sum(numbers_list)
+average = total / len(numbers_list)
+print(f"Largest: {largest}, Smallest: {smallest}, Average: {average}")
+num = input("Enter 3 numbers seperated by a space: ")
+num1_str, num2_str, num3_str = num.split()
+num1 = float(num1_str)
+num2 = float(num2_str)
+num3 = float(num3_str)
+ave = (num1 + num2 + num3) / 3
+
+print(f"Average of 3 numbes: {ave}")
+print(min(num1, num2, num3))
+print(max(num1, num2, num3))
