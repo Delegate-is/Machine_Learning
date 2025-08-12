@@ -1,3 +1,12 @@
+#python list methods == max and min
+num= [2,456,53,53,56,521,56,4]
+maxi_num = max(num)
+print(maxi_num)
+min_num = min(num)
+print(min_num)
+# python list method = reverse
+num.reverse()
+print(num)
 # python list method== append method
 list = ["Python", "JS", "Java", "C"]
 print(list)
