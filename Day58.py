@@ -24,3 +24,6 @@ print(word)
 num = int(input("Enter two numbers separated by space: "))
 num1, num2 = map(num.split)
 print(f"Sum = {num1+num2}")
+list_5 = [1, 2, 3, 4, 5]
+del_num = input("Enter index of number to delete: ")
+list_5.pop(del_num)

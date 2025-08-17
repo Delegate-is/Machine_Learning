@@ -13,3 +13,8 @@ if num2 != 0:
     print(f"quotient: {num1/num2}")
 else:
     print("not divided zero")
+    
+list_5 = [1, 2, 3, 4, 5]
+del_num = int(input("Enter index of number to delete: "))
+list_5.pop(del_num)
+print(list_5)
