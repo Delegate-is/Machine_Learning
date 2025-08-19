@@ -24,6 +24,6 @@ print(str(result) + " times present")
 fruits = ("Apple", "Orange", "Banana", "Mango", "Pineapple")
 n = input("Enter name of fruit: ")
 if n in fruits:
-    print(f"{n} is present {fruits.count(n)} times")
+    print(f"{n} is present {fruits.count(n)} times, at index {fruits.index(n)}")
 else:
     print("Not Present")
