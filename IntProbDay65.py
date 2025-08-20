@@ -38,3 +38,15 @@ arr = np.diag([6,7,8,9])
 print(arr)
 arr_1 = np.zeros((4,4))
 print(arr_1)
+# isidentifier method
+identifier = input("Enter an identifier")
+
+if identifier.isidentifier():
+    print("This is a valid identifier")
+else:
+    print("Not a valid")
+te = 2
+if str(te).isdigit():
+    print(True)
+else:
+    print(False)
