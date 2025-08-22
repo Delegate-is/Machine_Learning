@@ -40,3 +40,14 @@ dict.update(dict_1)
 print(dict.values())
 dict.update({5:"Friday"})
 print(dict)
+
+num = input("Enter two numbers seperated by a space: ")
+num1, num2 = map(float, num.split())
+sum = num1 + num2
+diff_result = num1 - num2
+product_result = num1 * num2
+quotient_result = num1 / num2  # This gives float division
+print(f"Sum: {sum}")
+print("Difference:", diff_result)
+print("Product:", product_result)
+print("Quotient:", quotient_result)
