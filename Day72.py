@@ -20,6 +20,19 @@ def unique_elements():
     st3 = set(input_list)
     print(st3)
 unique_elements()
+def unique_elements(input_list):
+    st = set(input_list)
+    print(st)
+    print(type(st))
+lst = [22,12,11,3,4,5]
+unique_elements(lst)
+# Define the function to get unique elements from a list
+def unique_elements(input_list):
+    return set(input_list)
+# Example usage
+sample_list = [1, 2, 2, 3, 4, 4, 5]
+unique_set = unique_elements(sample_list)
+print("Unique elements:", unique_set)
 
 # Create a set and update with item from user
 st1 = {"pink", "black", "boy", "girl"}
