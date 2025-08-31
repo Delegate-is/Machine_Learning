@@ -38,3 +38,12 @@ def common_elements(set1,set2):
 set1 = {1,2,3,4}
 set2 = {3,2,4}
 common_elements(set1,set2)
+def remove_duplicates(input_list):
+    # Convert the list to a set to remove duplicates
+    unique_set = set(input_list)
+    # Convert the set back to a list
+    unique_list = list(unique_set)
+    return unique_list
+input_list = [1, 2, 2, 3, 4, 4, 5]
+result = remove_duplicates(input_list)
+print("List after removing duplicates:", result)
