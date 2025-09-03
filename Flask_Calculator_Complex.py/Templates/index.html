@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Percentage Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .calculator {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            width: 320px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1.5px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            text-align: center;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h2>Percentage Calculator</h2>
+        <form method="POST">
+            <label for="total">Total Marks:</label>
+            <input type="number" step="any" id="total" name="total" required />
+
+            <label for="obtained">Obtained Marks:</label>
+            <input type="number" step="any" id="obtained" name="obtained" required />
+
+            <button type="submit">Calculate</button>
+        </form>
+        {% if result is not none %}
+            <div class="result">
+                {% if result is string %}
+                    {{ result }}
+                {% else %}
+                    Your percentage is: {{ result | round(2) }}%
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
