@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Countdown Timer</title>
+</head>
+<body>
+    <h2>Countdown Timer</h2>
+    <div id="timer"></div>
+
+    <script>
+        let start = {{ start }};
+        let end = {{ end }};
+        let current = start;
+
+        function updateTimer() {
+            document.getElementById('timer').innerText = current + ' seconds remaining';
+
+            if (current > end) {
+                current--;
+                setTimeout(updateTimer, 1000);
+            } else {
+                document.getElementById('timer').innerText = 'Timer finished!';
+            }
+        }
+
+        updateTimer();
+    </script>
+</body>
+</html>
