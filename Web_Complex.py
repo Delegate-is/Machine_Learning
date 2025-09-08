@@ -15,3 +15,4 @@
 # create folder css in static folder
 # create css file in css folder(style.css)
 # link css file to html file
+#####python manage.py runserver

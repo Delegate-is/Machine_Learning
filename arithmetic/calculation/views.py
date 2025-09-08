@@ -1,3 +1,12 @@
+# add path in urlpatterns list (path('', index),)
+# add url to main urls.py 
+# create template folder in app folder (calculation)
+# create html file in template folder(add another folder with app name(calculation) inside template folder and store html file there(index.html))
+# create folder static in app folder(calculation)
+# create folder css in static folder
+# create css file in css folder(style.css)
+# link css file to html file
+
 from django.shortcuts import render
 from . forms import CalculationForm
 # Create your views here.
