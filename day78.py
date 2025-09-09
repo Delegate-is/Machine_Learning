@@ -1,3 +1,7 @@
+def format_name(first_name, last_name):
+    return f"Your first name is {first_name.upper()} and last name {last_name.lower()}"
+print(format_name("Juma", "Kipkemoi"))
+print(format_name("Alooo", "Kipkemoi"))
 # Pandas program to perform basic operations on two pandas series and dataframe
 import pandas as pd
 import numpy as np
