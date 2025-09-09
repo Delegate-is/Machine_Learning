@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Integer to Complex Converter</title>
+</head>
+<body>
+    <h1>Convert Integer to Complex Number</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Convert</button>
+    </form>
+
+    {% if complex_number %}
+        <h2>Complex Number: {{ complex_number }}</h2>
+    {% endif %}
+</body>
+</html>

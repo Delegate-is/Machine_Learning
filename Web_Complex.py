@@ -43,3 +43,15 @@
 # http://
 # Access the web page to display the student details
 # http://
+
+# Web app to create a super user and view in admin area
+# python manage.py createsuperuser
+# username: juma
+# email:
+# password: ********
+# confirm password: ********
+# python manage.py runserver
+# http://
+# login with username and password
+# add student details in admin area
+# view student details in web page
