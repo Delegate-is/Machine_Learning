@@ -24,4 +24,5 @@ urlpatterns = [
     path('contact_us', contact_us, name='contact_us'),
     path('about_us', about_us, name='about_us'),
     path("ppt", create_ppt, name="create_ppt"),
+    path("marks", create_ppt, name="marks"),
 ]

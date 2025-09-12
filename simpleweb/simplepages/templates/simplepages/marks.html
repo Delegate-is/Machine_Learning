@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Marks Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Student Marks Calculator</h1>
+
+        <form id="marksForm" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <input type="number" id="mark1" placeholder="Mark 1" class="w-full p-3 rounded-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" min="0" max="100" required>
+                <input type="number" id="mark2" placeholder="Mark 2" class="w-full p-3 rounded-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" min="0" max="100" required>
+                <input type="number" id="mark3" placeholder="Mark 3" class="w-full p-3 rounded-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" min="0" max="100" required>
+                <input type="number" id="mark4" placeholder="Mark 4" class="w-full p-3 rounded-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" min="0" max="100" required>
+                <input type="number" id="mark5" placeholder="Mark 5" class="w-full p-3 rounded-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" min="0" max="100" required>
+            </div>
+            <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-md hover:bg-blue-700 transition-all duration-200">Calculate</button>
+        </form>
+
+        <div id="results" class="mt-8 space-y-4 hidden">
+            <div class="bg-gray-100 p-6 rounded-lg">
+                <p class="text-lg font-medium text-gray-700">Total Marks: <span id="total" class="font-bold text-gray-900"></span></p>
+                <p class="text-lg font-medium text-gray-700">Average Marks: <span id="average" class="font-bold text-gray-900"></span></p>
+                <p class="text-lg font-medium text-gray-700">Percentage: <span id="percentage" class="font-bold text-gray-900"></span></p>
+            </div>
+            <div id="error-message" class="text-red-600 font-medium text-center hidden"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('marksForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const marks = [];
+            let allValid = true;
+            for (let i = 1; i <= 5; i++) {
+                const markInput = document.getElementById(`mark${i}`);
+                const mark = parseInt(markInput.value);
+                
+                if (isNaN(mark) || mark < 0 || mark > 100) {
+                    allValid = false;
+                    markInput.classList.add('border-red-500');
+                } else {
+                    marks.push(mark);
+                    markInput.classList.remove('border-red-500');
+                }
+            }
+
+            const resultsDiv = document.getElementById('results');
+            const errorMessageDiv = document.getElementById('error-message');
+
+            if (!allValid) {
+                errorMessageDiv.textContent = 'Please enter valid marks (0-100) for all fields.';
+                errorMessageDiv.classList.remove('hidden');
+                resultsDiv.classList.add('hidden');
+            } else {
+                errorMessageDiv.classList.add('hidden');
+                
+                const total = marks.reduce((sum, current) => sum + current, 0);
+                const average = total / marks.length;
+                const percentage = (total / (marks.length * 100)) * 100;
+
+                document.getElementById('total').textContent = total;
+                document.getElementById('average').textContent = average.toFixed(2);
+                document.getElementById('percentage').textContent = percentage.toFixed(2) + '%';
+                
+                resultsDiv.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

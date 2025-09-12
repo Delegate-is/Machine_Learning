@@ -10,6 +10,9 @@ def contact_us(request):
 def about_us(request):
     return render(request, "simplepages/about_us.html")
 
+def about_us(request):
+    return render(request, "simplepages/marks.html")
+
 from django.shortcuts import render
 from django.http import HttpResponse
 from .forms import SlideForm
