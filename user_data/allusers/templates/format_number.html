@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phone Formatter</title>
+</head>
+<body>
+    <h1>Phone Number Formatter</h1>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="phone" placeholder="Enter phone number" required>
+        <button type="submit">Format</button>
+    </form>
+
+    {% if formatted %}
+        <h2>Formatted Number: {{ formatted }}</h2>
+    {% endif %}
+
+    <!-- Home button -->
+    <a href="{% url 'home' %}">
+        <button>Home</button>
+    </a>
+</body>
+</html>
