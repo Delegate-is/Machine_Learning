@@ -49,3 +49,32 @@ def translator_view(request):
                 translation = f"❌ Error: {e}"
 
     return render(request, "product/translator.html",)
+
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from productmgt.utils import generate_otp
+from productmgt.sms_utils import send_otp_via_sms
+
+otp_storage = {}  # temporary storage (use DB/Redis in real apps)
+
+def request_otp(request):
+    if request.method == "POST":
+        mobile = request.POST.get("mobile")
+        otp = generate_otp()
+        otp_storage[mobile] = otp  # store OTP for that mobile
+        send_otp_via_sms(mobile, otp)
+        return HttpResponse("OTP sent successfully!")
+
+    return render(request, "product/request_otp.html")
+
+def verify_otp(request):
+    if request.method == "POST":
+        mobile = request.POST.get("mobile")
+        otp_entered = request.POST.get("otp")
+
+        if otp_storage.get(mobile) == otp_entered:
+            return HttpResponse("✅ OTP Verified Successfully!")
+        else:
+            return HttpResponse("❌ Invalid OTP. Try again.")
+
+    return render(request, "product/verify_otp.html")

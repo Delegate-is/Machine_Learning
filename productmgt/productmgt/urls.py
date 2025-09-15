@@ -22,4 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("", home, name="home"),
     path('translator', translator_view, name="translator"),
+    path("request", request_otp, name="request"),
+    path("verify", verify_otp, name="verify"),
 ]
