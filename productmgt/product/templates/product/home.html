@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Form</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        table {
+            border-collapse: collapse;
+            width: 50%;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #999;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <nav style="background:#333; padding:10px; margin-bottom:20px;">
+        <a href="/" style="color:white; margin-right:20px; text-decoration:none;">🏠 Home</a>
+        <a href="{% url 'translator' %}" style="color:white; text-decoration:none;">🌍 Arabic Translator</a>
+    </nav>
+    </nav>
+    <h1>Product Form</h1>
+    
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+    <p>Total : {{total}}</p>
+    <p>Percentage : {{per}}</p>
+    <p>Net Total : {{net_total}}</p>
+
+    {% if values %}
+        <h2>Submitted Values</h2>
+        <table>
+            <tr>
+                <th>Field</th>
+                <th>Value</th>
+            </tr>
+            {% for key, value in values.items %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td>{{ value }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+</body>
+</html>

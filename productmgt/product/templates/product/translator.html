@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>English → Arabic Translator</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; }
+        .container { max-width: 500px; margin: auto; padding: 20px; background: #fff;
+                     border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        h1 { color: #2c3e50; text-align: center; }
+        form { margin-top: 20px; text-align: center; }
+        input[type=text] { padding: 10px; width: 80%; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 10px 20px; background: #3498db; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #2980b9; }
+        .result { margin-top: 20px; padding: 15px; background: #ecf0f1; border-radius: 5px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🇬🇧 English → 🇸🇦 Arabic Translator</h1>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="text" name="word" placeholder="Enter English word..." required>
+            <button type="submit">Translate</button>
+        </form>
+        
+        {% if translation %}
+        <div class="result">
+            <h3>Arabic Translation:</h3>
+            <p>{{ translation }}</p>
+        </div>
+        {% endif %}
+        <div class="text-center mt-3">
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary">⬅ Back to Homepage</a>
+        </div>
+    </div>
+</body>
+</html>
