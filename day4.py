@@ -1,3 +1,20 @@
+i = int(input("Enter a number: "))
+dict = {i:i**2}
+print(dict)
+list_1 = []
+for i in range(5):
+    list_1.append(input(f"Enter a student name {i+1} :"))
+    print(list_1)
+    
+print("Student name  before sorting" +str(lst))
+list_1.sort()
+print("Student name  After sorting" +str(lst))
+
+print("Student Name which have five char")
+for i in list_1:
+    if len(i) == 5:
+        print(i)
+
 print("Hello, World!")
 a = 4 # Giving a value to a variable
 b = 5 # Giving b a value
