@@ -1,3 +1,20 @@
+def is_palindrome(input_string):
+    input_string = str(input_string)
+    result = input_string[::-1]
+    return result
+
+input_value = 254
+reversed_value = is_palindrome(input_value)
+if reversed_value == str(input_value)[::-1]:
+    print(True)
+else:
+    print(False)
+
+def is_palindrome(input_string):
+    reversed_string = input_string[::-1]
+    return input_string == reversed_string
+
+
 #Generate string password length given by user
 import string
 import random
