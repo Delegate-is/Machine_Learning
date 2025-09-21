@@ -1,3 +1,24 @@
+# Pandas program to get subset from existing series
+import pandas as pd
+
+s = pd.Series([1,2,3,4,5,6,6,554,6,7])
+print(s)
+
+n = 4
+new_s = s[s < n]
+print(new_s)
+
+import pandas as pd
+# Create a sample series
+data = pd.Series([10, 20, 30, 40, 50, 60, 70])
+print("Original Series:")
+print(data)
+# Get a subset (say elements from index 2 to 5)
+subset = data[2:6]
+print("\nSubset of the Series (index 2 to 5):")
+print(subset)
+
+
 import math
 class Circle:
     def __init__(self, radius, color):
@@ -66,3 +87,6 @@ obj.getData()
 obj.showResult()
 obj.Max_num()
 obj.create_list()
+
+# Web App to add login functionality in Django
+# Web App to register user in Django
