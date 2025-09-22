@@ -114,3 +114,13 @@ obj = Car()
 obj._set_car_details()
 obj.display_car_details()
         
+
+# get alpha char to chec whether it is in a given range or not
+import re
+# a to f
+s = input("Enter a char: ")
+x = re.search('[a-fA-F]', s)
+if x:
+    print("Matching .....")
+else:
+    print("Not Matching.....")
