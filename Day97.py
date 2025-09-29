@@ -1,3 +1,33 @@
+#Define a class named BankAccount.
+#Define attributes account_number, account_holder, and balance inside the class.
+#Implement methods deposit(amount), withdraw(amount), and display_balance() to deposit, withdraw, and display the balance.
+class BankAccount:
+    account_number = ""
+    account_holder = ""
+    balance = 0.0
+    def __init__(self, acc_num, acc_holder, bal):
+        self.account_number = acc_num
+        self.account_holder = acc_holder
+        self.balance = bal
+    def deposit(self, amount):
+        self.balance += amount
+        print(f"Deposited: {amount}. New balance: {self.balance}")
+    def withdraw(self, amount):
+        if amount > self.balance:
+            print("Insufficient balance")
+        else:
+            self.balance -= amount
+            print(f"Withdrew: {amount}. New balance: {self.balance}")
+    def display_balance(self):
+        print(f"Account Holder: {self.account_holder}, Account Number: {self.account_number}, Balance: {self.balance}")
+        
+# Example usage
+account = BankAccount("123456789", "John Doe", 1000.0)
+account.display_balance()
+account.deposit(500)
+account.withdraw(200)
+account.display_balance()
+
 # create class marks with 3 data members
 class Marks:
     sub1 = 0
