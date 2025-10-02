@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact - Automobile Association</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Automobile Association</h1>
+  </header>
+
+  <main class="page-content">
+    <h2>Contact Us</h2>
+    <p>We’d love to hear from you! Reach us at:</p>
+    <p><strong>Phone:</strong> +254 700 000 000</p>
+    <p><strong>Email:</strong> info@aa.com</p>
+    <p><strong>Address:</strong> Nairobi, Kenya</p>
+
+    <form>
+      <label for="name">Your Name:</label><br>
+      <input type="text" id="name" name="name" required><br><br>
+      
+      <label for="email">Your Email:</label><br>
+      <input type="email" id="email" name="email" required><br><br>
+      
+      <label for="message">Message:</label><br>
+      <textarea id="message" name="message" rows="4" required></textarea><br><br>
+      
+      <button type="submit">Send Message</button>
+    </form>
+  </main>
+  <p>
+    <a href="{% url 'index' %}" class="btn-back">⬅ Back to Homepage</a>
+    </p>
+
+  <footer>
+    <p>&copy; 2025 Automobile Association. All Rights Reserved.</p>
+  </footer>
+</body>
+</html>
