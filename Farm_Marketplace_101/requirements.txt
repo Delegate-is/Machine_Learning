@@ -1,0 +1,10 @@
+Flask==2.3.3
+Flask-SQLAlchemy==3.0.3
+Flask-Login==0.6.2
+Flask-WTF==1.1.1
+Werkzeug==2.3.7
+python-dotenv==1.0.0
+requests==2.31.0
+Pillow==10.0.1 # image resizing
+boto3==1.30.0 # optional for S3
+gunicorn==21.2.0 # production server

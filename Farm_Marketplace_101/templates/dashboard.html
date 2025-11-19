@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3 class="fw-bold mb-3">Your Products</h3>
+
+<a href="/add_product" class="btn btn-primary mb-3">+ Add Product</a>
+
+<div class="row g-4">
+    {% for p in products %}
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            {% if p.image_filename %}
+            <img src="/static/uploads/{{ p.image_filename }}" class="card-img-top" style="height: 180px; object-fit: cover;">
+            {% endif %}
+
+            <div class="card-body">
+                <h5>{{ p.name }}</h5>
+                <p>KSh {{ "%.0f"|format(p.price) }}</p>
+                <a href="/product/{{ p.id }}" class="btn btn-outline-success w-100">View</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

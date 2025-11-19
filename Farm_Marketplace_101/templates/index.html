@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4 fw-bold">Latest Farm Products</h2>
+
+<div class="row g-4">
+    {% for p in products %}
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            {% if p.image_filename %}
+            <img src="/static/uploads/{{ p.image_filename }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+            {% else %}
+            <img src="https://via.placeholder.com/400x200?text=No+Image" class="card-img-top">
+            {% endif %}
+
+            <div class="card-body">
+                <h5 class="card-title">{{ p.name }}</h5>
+                <p class="card-text text-muted">{{ p.description[:80] }}...</p>
+                <p class="fw-bold">KSh {{ "%.0f" | format(p.price) }}</p>
+                <a href="/product/{{ p.id }}" class="btn btn-success w-100">View Product</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
