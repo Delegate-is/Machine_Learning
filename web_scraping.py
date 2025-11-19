@@ -27,3 +27,8 @@ for product in products:
     price = price_tag.text.strip() if price_tag else "No price"
 
     print(f"{name}  -->  {price}")
+# .\.venv\Scripts\activate
+# python -m pip install beautifulsoup4 requests lxml
+# python Machine_Learning/web_scraping.py
+# Deactivate virtual environment
+# deactivate
