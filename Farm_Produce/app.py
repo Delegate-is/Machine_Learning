@@ -3,6 +3,8 @@
 #  pip install Flask
 #  pip install Flask-SQLAlchemy
 #  pip install Flask-Login
+# cd Machine_Learning\Farm_Produce
+# flask run
 
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
