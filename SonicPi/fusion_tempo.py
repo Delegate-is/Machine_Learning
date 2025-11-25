@@ -174,37 +174,73 @@ live_loop :drums, sync: :dark_pad do
 end
     """
     
-    """use_bpm 104
+    """use_bpm 140
 
-define :sw do |t|  # swing helper
-  return t * (ring 1, 0.85).tick
-end
-
-# --- PADS ---
-live_loop :pads do
-  use_synth :dark_ambience
-  play_chord [:a3, :c4, :e4], sustain: 4, amp: 0.7
+### DARK CHORD PAD ###
+live_loop :pad, sync: :kick do
+  use_synth :hollow
+  play_chord [:g3, :bb3, :d4], sustain: 4, release: 2, amp: 0.6
   sleep 4
 end
 
-# --- SWUNG BASS ---
-live_loop :bass, sync: :pads do
-  use_synth :fm
-  sleep sw(0.5)
-  play :a2, release: 0.3, amp: 1
-  sleep sw(0.5)
-  play :a2, release: 0.2
-  sleep sw(1)
+### GUITAR-LIKE PLUCK (ROCKSTAR FEEL) ###
+live_loop :pluck, sync: :kick do
+  use_synth :pluck
+  with_fx :reverb, mix: 0.5, room: 0.8 do
+    notes = [:d5, :bb4, :g4, :d5]
+    notes.each do |n|
+      play n, amp: 0.8, release: 0.3, cutoff: 90
+      sleep 0.5
+    end
+  end
 end
 
-# --- SWING DANCEHALL DRUMS (light) ---
-live_loop :drums do
-  sample :bd_tek, amp: 1.2
-  sleep sw(0.75)
-  sample :elec_tick, amp: 0.4
-  sleep sw(0.25)
-  sample :sn_dolf, amp: 0.5
-  sleep sw(1)
+### 808 BASS (MINIMAL & CLEAN) ###
+live_loop :bass, sync: :kick do
+  use_synth :fm
+  use_synth_defaults release: 0.4, amp: 1.2, depth: 2
+  play :g2
+  sleep 1
+  play :g2
+  sleep 1
+  play :bb2
+  sleep 2
+end
+
+### SPARSE KICK ###
+live_loop :kick do
+  sample :bd_haus, amp: 1
+  sleep 1
+  sleep 0.5
+  sample :bd_haus, amp: 0.8
+  sleep 2.5
+end
+
+### LIGHT SNARE (ROCKSTAR STYLE) ###
+live_loop :snare, sync: :kick do
+  sleep 1
+  sample :sn_generic, amp: 1.5
+  sleep 2
+end
+
+### HIHATS WITH SWING ###
+live_loop :hats, sync: :kick do
+  with_fx :lpf, cutoff: 100 do
+    sleep 0.25
+    7.times do
+      sample :drum_cymbal_closed, amp: 0.6
+      sleep (ring 0.25, 0.23, 0.27, 0.25).tick # small swing
+    end
+  end
+end
+
+### VOCAL AD-LIB STYLE FX ###
+live_loop :adlibs, sync: :kick do
+  with_fx :echo, phase: 0.375, mix: 0.25 do
+    sample :perc_snap, amp: 0.7 if one_in(8)
+    sample :elec_blip2, amp: 0.3, rate: -1 if one_in(12)
+  end
+  sleep 2
 end
 
     """
