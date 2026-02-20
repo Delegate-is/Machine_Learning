@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ariel Logistics Quote Calculator</title>
+    <style>
+        body { font-family: Arial; padding: 40px; }
+        input, select { margin: 5px; padding: 5px; }
+        button { padding: 8px 15px; }
+        .result { margin-top: 20px; font-size: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<h2>Ariel Logistics – Trip Quote Calculator</h2>
+
+<form method="POST">
+    Base Fee (KSh): <input type="number" name="base_fee" value="2000" required><br>
+    Distance (km): <input type="number" name="distance" required><br>
+    Per Km Rate (KSh): <input type="number" name="per_km" value="120" required><br>
+
+    Zone:
+    <select name="zone_multiplier">
+        <option value="1.0">Zone A – Flat</option>
+        <option value="1.2">Zone B – Undulating</option>
+        <option value="1.4">Zone C – Hilly</option>
+    </select><br>
+
+    Seasonal Adjustment (%):
+    <input type="number" name="seasonal" value="10"><br>
+
+    <button type="submit">Calculate Quote</button>
+</form>
+
+{% if total %}
+<div class="result">
+    Total Charge: KSh {{ "{:,.2f}".format(total) }}
+</div>
+{% endif %}
+
+</body>
+</html>

@@ -1,0 +1,20 @@
+import pymysql
+import pandas as pd
+
+# Connect to your local SQL server
+db = pymysql.connect(
+    host="localhost",
+    user="root",        # Default XAMPP user
+    password="",        # Default XAMPP password is empty
+    database="avatar" 
+)
+
+# 1. To list all tables in the database
+cursor = db.cursor()
+cursor.execute("SHOW TABLES")
+for table in cursor:
+    print(table)
+
+# 2. To view the content of a specific table
+df = pd.read_sql("SELECT * FROM products", db)
+print(df.head()) # Shows the first 5 rows

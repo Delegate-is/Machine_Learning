@@ -1,5 +1,8 @@
 import pymysql
 # Connect to the database server
+# Open your XAMPP Control Panel (or whichever local server you use)
+# Click Start next to Apache and MySQL to start the servers.
+# localhost/phpmyadmin/
 connection = pymysql.connect(
     host='localhost',
     user='root',
