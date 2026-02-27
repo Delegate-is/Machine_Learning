@@ -1,0 +1,109 @@
+NJUWAN FARM ERP SYSTEM
+LLM PROJECT MEMORY FILE
+====================================
+
+PROJECT NAME:
+Njuwan Farm ERP
+
+OBJECTIVE:
+Build a scalable farm ERP system for dairy, crops, inventory, finance, analytics,
+and future yoghurt + feed business expansion.
+
+------------------------------------
+CURRENT SYSTEM VERSION: v1.0
+LAST UPDATED: [UPDATE DATE HERE]
+------------------------------------
+
+CORE MODULES STATUS
+------------------------------------
+[✓] Dairy Module (Cow, MilkProduction, FeedUsage)
+[✓] Financial Ledger Module (Transactions)
+[✓] Basic Dashboard (Milk Total, Cost per Litre, Profit)
+[ ] Crop ROI Engine (Advanced)
+[ ] Inventory Auto-Deduction Logic
+[ ] Yoghurt Module
+[ ] Feed Sales Module
+[ ] Forecasting Engine
+[ ] Role-based Authentication
+[ ] Advanced KPI Dashboard
+------------------------------------
+
+ACTIVE PRIORITY
+------------------------------------
+Current Focus:
+→ Improve Inventory + Cost Tracking Accuracy
+
+Why:
+Need accurate cost-per-litre before expansion.
+
+------------------------------------
+
+KEY BUSINESS RULES (DO NOT BREAK)
+------------------------------------
+1. Dairy is primary revenue engine.
+2. True cost per litre must always be calculable.
+3. All income and expense must go through Transaction model.
+4. Inventory must reflect real stock levels.
+5. System must remain scalable to PostgreSQL.
+
+------------------------------------
+
+ANALYTICS LOGIC REFERENCE
+------------------------------------
+Cost per Litre = Total Dairy Costs / Total Milk Produced
+Feed Efficiency = Litres Produced / Kg Feed Used
+Crop ROI = (Revenue - Total Cost) / Total Cost
+Net Profit = Total Income - Total Expense
+
+------------------------------------
+
+DECISIONS LOG
+------------------------------------
+v1.0:
+- Using Flask + SQLAlchemy
+- SQLite as starter DB
+- Dashboard-first approach
+- Modular structure
+
+------------------------------------
+
+NEXT DEVELOPMENT PHASE
+------------------------------------
+Phase 2 – Intelligence Layer
+- Cow profitability ranking
+- Crop profitability comparison
+- Inventory turnover analytics
+- Monthly trend graphs
+
+------------------------------------
+
+EXPANSION STRATEGY
+------------------------------------
+Future:
+- Yoghurt processing module
+- Feed sales module
+- Scenario simulation engine
+- IoT milk meter integration
+
+------------------------------------
+
+DO NOT REBUILD:
+------------------------------------
+- Dairy model
+- Transaction model
+- Dashboard structure
+
+Only extend and improve.
+
+------------------------------------
+
+NOTES TO FUTURE SELF / LLM
+------------------------------------
+Before adding features:
+1. Check if module already exists.
+2. Extend — don’t duplicate.
+3. Maintain profitability visibility.
+4. Keep ERP business-driven, not feature-driven.
+
+END OF FILE
+====================================

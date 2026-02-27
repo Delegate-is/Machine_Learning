@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">Investor Analytics Dashboard</h2>
+
+<div class="row">
+
+    <div class="col-md-6">
+        <canvas id="milkChart"></canvas>
+    </div>
+
+    <div class="col-md-6">
+        <canvas id="financeChart"></canvas>
+    </div>
+
+</div>
+
+<hr class="my-4">
+
+<h4>Cow Productivity Ranking</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Cow Tag</th>
+            <th>Total Milk (Litres)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cow in cow_rank %}
+        <tr>
+            <td>{{ cow.tag_number }}</td>
+            <td>{{ cow.total_milk }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<hr class="my-4">
+
+<h4>Crop ROI Comparison</h4>
+
+<div class="row">
+    <div class="col-md-6">
+        <canvas id="cropChart"></canvas>
+    </div>
+</div>
+
+<table class="table table-bordered mt-4">
+    <thead>
+        <tr>
+            <th>Crop</th>
+            <th>Total Cost</th>
+            <th>Total Revenue</th>
+            <th>ROI (%)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for crop in crop_data %}
+        <tr style="background-color:
+            {% if crop.roi > 40 %}#c8f7c5
+            {% elif crop.roi > 10 %}#fff3cd
+            {% else %}#f8d7da
+            {% endif %}
+        ">
+            <td>{{ crop.name }}</td>
+            <td>{{ crop.cost }}</td>
+            <td>{{ crop.revenue }}</td>
+            <td>{{ crop.roi }}%</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+const milkCtx = document.getElementById('milkChart');
+new Chart(milkCtx, {
+    type: 'line',
+    data: {
+        labels: {{ months }},
+        datasets: [{
+            label: 'Monthly Milk Production',
+            data: {{ milk_totals }},
+            borderWidth: 2
+        }]
+    }
+});
+
+const financeCtx = document.getElementById('financeChart');
+new Chart(financeCtx, {
+    type: 'bar',
+    data: {
+        labels: ['Revenue', 'Expense'],
+        datasets: [{
+            label: 'Financial Overview',
+            data: [{{ income }}, {{ expense }}],
+            borderWidth: 1
+        }]
+    }
+});
+</script>
+
+<script>
+const cropCtx = document.getElementById('cropChart');
+
+new Chart(cropCtx, {
+    type: 'bar',
+    data: {
+        labels: {{ crop_data | map(attribute='name') | list }},
+        datasets: [{
+            label: 'ROI (%)',
+            data: {{ crop_data | map(attribute='roi') | list }},
+            borderWidth: 1
+        }]
+    }
+});
+</script>
+
+{% endblock %}

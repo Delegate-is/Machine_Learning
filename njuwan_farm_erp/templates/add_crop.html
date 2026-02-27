@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Add Crop</h2>
+<form method="POST">
+    Tag: <input type="text" name="tag"><br>
+    Crop: <input type="text" name="crop"><br>
+    Acreage: <input type="number" name="acre"><br>
+    Planting Date: <input type="date" name="date"><br>
+    <button type="submit">Save</button>
+</form>
+
+{% endblock %}

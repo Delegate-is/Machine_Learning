@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>System Governance Dashboard</h2>
+
+<p><strong>Current Version:</strong> {{ state.version }}</p>
+<p><strong>Last Updated:</strong> {{ state.last_updated }}</p>
+<p><strong>Active Priority:</strong> {{ state.active_priority }}</p>
+<p><strong>Roadmap Phase:</strong> {{ state.roadmap_phase }}</p>
+
+<h3>Completed Modules:</h3>
+<ul>
+    {% for module in state.modules_completed %}
+    <li>{{ module }}</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

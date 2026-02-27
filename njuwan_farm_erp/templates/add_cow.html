@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Add Cow</h2>
+<form method="POST">
+    Tag: <input type="text" name="tag"><br>
+    Breed: <input type="text" name="breed"><br>
+    Birth Date: <input type="date" name="birth"><br>
+    Status: <input type="text" name="status"><br>
+    <button type="submit">Save</button>
+</form>
+
+{% endblock %}
