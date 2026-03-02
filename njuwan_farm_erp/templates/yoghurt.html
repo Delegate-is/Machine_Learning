@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">Yoghurt Vertical Integration Engine</h2>
+
+<div class="row">
+
+    <div class="col-md-3">
+        <div class="card shadow">
+            <div class="card-body">
+                <h6>Total Milk Used</h6>
+                <h4>{{ data.milk_used }} L</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow">
+            <div class="card-body">
+                <h6>Total Revenue</h6>
+                <h4>KSh {{ data.revenue }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow">
+            <div class="card-body">
+                <h6>Total Profit</h6>
+                <h4>KSh {{ data.profit }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow bg-light">
+            <div class="card-body">
+                <h6>Profit Margin</h6>
+                <h4>{{ data.margin }}%</h4>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<hr class="my-4">
+
+<h4>Break-Even Simulation</h4>
+
+<label>Fixed Monthly Processing Cost (KSh)</label>
+<input type="number" id="fixedCost" class="form-control mb-3" value="50000">
+
+<label>Price per Cup (KSh)</label>
+<input type="number" id="pricePerCup" class="form-control mb-3" value="50">
+
+<label>Variable Cost per Cup (KSh)</label>
+<input type="number" id="variableCost" class="form-control mb-3" value="20">
+
+<button onclick="calculateBreakEven()" class="btn btn-success">Calculate</button>
+
+<h5 class="mt-3">Break-Even Cups: <span id="result"></span></h5>
+
+<script>
+function calculateBreakEven() {
+    let fixed = parseFloat(document.getElementById("fixedCost").value);
+    let price = parseFloat(document.getElementById("pricePerCup").value);
+    let variable = parseFloat(document.getElementById("variableCost").value);
+
+    let contribution = price - variable;
+    let breakEven = fixed / contribution;
+
+    document.getElementById("result").innerText = breakEven.toFixed(0);
+}
+</script>
+
+{% endblock %}

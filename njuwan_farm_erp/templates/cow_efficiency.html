@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">Cow Feed Efficiency Ranking</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Cow</th>
+            <th>Total Milk</th>
+            <th>Total Feed (kg)</th>
+            <th>Litres per kg Feed</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cow in data %}
+        <tr>
+            <td>{{ cow.cow }}</td>
+            <td>{{ cow.milk }}</td>
+            <td>{{ cow.feed_kg }}</td>
+            <td>{{ cow.efficiency }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

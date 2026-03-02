@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">Feed Cost Sensitivity Simulator</h2>
+
+<div class="row mb-4">
+
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-body">
+                <h5>Current Feed Cost Per Litre</h5>
+                <h3 id="currentCost">KSh {{ data.feed_cost_per_litre }}</h3>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="mb-4">
+    <label class="form-label">Adjust Feed Cost Impact (%)</label>
+    <input type="range" min="-20" max="20" value="0" class="form-range" id="costSlider">
+    <p>Adjustment: <span id="sliderValue">0</span>%</p>
+</div>
+
+<script>
+const baseCost = {{ data.feed_cost_per_litre }};
+const slider = document.getElementById("costSlider");
+const sliderValue = document.getElementById("sliderValue");
+const currentCost = document.getElementById("currentCost");
+
+slider.oninput = function() {
+    sliderValue.innerText = this.value;
+
+    let adjustment = this.value / 100;
+    let newCost = baseCost * (1 + adjustment);
+
+    currentCost.innerText = "KSh " + newCost.toFixed(2);
+}
+</script>
+
+{% endblock %}

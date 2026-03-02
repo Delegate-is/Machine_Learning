@@ -1,3 +1,4 @@
+# pip install -r requirements.txt
 from flask import Flask, render_template, request, redirect
 from config import Config
 from database import db
@@ -6,6 +7,11 @@ from version import increment_version
 from project_state import load_state
 from models import MilkProduction, Transaction, Cow
 from analytics import monthly_milk_data, revenue_vs_expense, cow_profitability, crop_roi_analysis
+from projection import three_year_projection
+from analytics import feed_efficiency_model
+from analytics import cow_feed_efficiency
+from yoghurt_engine import yoghurt_profit_analysis
+from valuation_engine import farm_valuation
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -121,6 +127,31 @@ def analytics_dashboard():
         cow_rank=cow_rank,
         crop_data=crop_data,
     )
+
+@app.route("/projection")
+def projection_dashboard():
+    data = three_year_projection()
+    return render_template("projection.html", data=data)
+
+@app.route("/feed-efficiency")
+def feed_efficiency():
+    data = feed_efficiency_model()
+    return render_template("feed_efficiency.html", data=data)
+
+@app.route("/cow-efficiency")
+def cow_efficiency():
+    data = cow_feed_efficiency()
+    return render_template("cow_efficiency.html", data=data)
+
+@app.route("/yoghurt")
+def yoghurt_dashboard():
+    data = yoghurt_profit_analysis()
+    return render_template("yoghurt.html", data=data)
+
+@app.route("/valuation")
+def valuation_dashboard():
+    data = farm_valuation()
+    return render_template("valuation.html", data=data)
 
 if __name__ == "__main__":
     app.run(debug=True)

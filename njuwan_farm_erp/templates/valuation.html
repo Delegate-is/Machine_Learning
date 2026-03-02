@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">Farm Enterprise Valuation</h2>
+
+<div class="row">
+
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-body">
+                <h6>DCF Valuation</h6>
+                <h4>KSh {{ data.dcf_value }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-body">
+                <h6>EBITDA Multiple Valuation</h6>
+                <h4>KSh {{ data.ebitda_value }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow bg-light">
+            <div class="card-body">
+                <h6>Terminal Value (Year 3)</h6>
+                <h4>KSh {{ data.terminal_value }}</h4>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<hr class="my-4">
+
+<h4>Valuation Sensitivity</h4>
+
+<label>Discount Rate (%)</label>
+<input type="range" min="10" max="25" value="15" class="form-range" id="discountSlider">
+
+<p>Selected Rate: <span id="rateValue">15</span>%</p>
+
+<script>
+const slider = document.getElementById("discountSlider");
+const rateValue = document.getElementById("rateValue");
+
+slider.oninput = function() {
+    rateValue.innerText = this.value;
+}
+</script>
+
+{% endblock %}

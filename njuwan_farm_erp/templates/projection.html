@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">3-Year Growth Projection</h2>
+
+<canvas id="profitChart"></canvas>
+
+<hr class="my-4">
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Year</th>
+            <th>Milk Output</th>
+            <th>Revenue</th>
+            <th>Expense</th>
+            <th>Profit</th>
+            <th>Cows</th>
+            <th>Acreage</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in data %}
+        <tr>
+            <td>{{ row.year }}</td>
+            <td>{{ row.milk }}</td>
+            <td>{{ row.income }}</td>
+            <td>{{ row.expense }}</td>
+            <td>{{ row.profit }}</td>
+            <td>{{ row.cows }}</td>
+            <td>{{ row.acreage }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+const ctx = document.getElementById('profitChart');
+
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: {{ data | map(attribute='year') | list }},
+        datasets: [{
+            label: 'Projected Profit',
+            data: {{ data | map(attribute='profit') | list }},
+            borderWidth: 3
+        }]
+    }
+});
+</script>
+
+{% endblock %}

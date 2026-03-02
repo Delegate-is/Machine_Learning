@@ -78,3 +78,23 @@ class Transaction(db.Model):
     category = db.Column(db.String(100))
     amount = db.Column(db.Float)
     type = db.Column(db.String(10))  # income / expense
+    
+class FeedType(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    cost_per_kg = db.Column(db.Float)
+
+
+class FeedConsumption(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    cow_id = db.Column(db.Integer, db.ForeignKey('cow.id'))
+    feed_id = db.Column(db.Integer, db.ForeignKey('feed_type.id'))
+    quantity_kg = db.Column(db.Float)
+    
+class YoghurtProduction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    milk_used_litres = db.Column(db.Float)
+    cups_produced = db.Column(db.Integer)
+    selling_price_per_cup = db.Column(db.Float)
+    processing_cost = db.Column(db.Float)
+    packaging_cost = db.Column(db.Float)
