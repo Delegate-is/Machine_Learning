@@ -99,7 +99,7 @@ def cow_feed_efficiency():
         efficiency = (milk_total / total_feed) if total_feed > 0 else 0
 
         results.append({
-            "cow": cow.tag,
+            "cow": cow.tag_number,
             "milk": milk_total,
             "feed_kg": total_feed,
             "efficiency": round(efficiency, 2)

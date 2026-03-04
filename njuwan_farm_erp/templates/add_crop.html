@@ -1,12 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h2>Add Crop</h2>
+<h2>Add Crop Record</h2>
+
+<div class="mb-4">
+    <img src="{{ url_for('static', filename='images/crop.jpg') }}" class="img-fluid rounded shadow">
+</div>
+
 <form method="POST">
     Tag: <input type="text" name="tag"><br>
     Crop: <input type="text" name="crop"><br>
     Acreage: <input type="number" name="acre"><br>
-    Planting Date: <input type="date" name="date"><br>
+    <label>Planting Date</label>
+    <input type="date" name="planting_date" class="form-control" required><br>
     <button type="submit">Save</button>
 </form>
 

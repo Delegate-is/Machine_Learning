@@ -1,62 +1,203 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h2 class="mb-4">Executive Overview</h2>
+<div class="hero mb-4">
+    <h2>Executive Dashboard</h2>
+    <p>Integrated Dairy, Crop & Financial Intelligence System</p>
+</div>
 
-<div class="row">
+<div class="row text-center mb-5">
 
     <div class="col-md-4">
-        <div class="card shadow">
-            <div class="card-body">
-                <h5>Total Milk Produced</h5>
-                <h3>{{ total_milk }} Litres</h3>
-            </div>
+        <div class="card p-4">
+            <h6>Total Milk</h6>
+            <h3 id="milkCounter">0</h3>
         </div>
     </div>
 
     <div class="col-md-4">
-        <div class="card shadow">
-            <div class="card-body">
-                <h5>Cost Per Litre</h5>
-                <h3>KSh {{ cost_per_litre }}</h3>
-            </div>
+        <div class="card p-4">
+            <h6>Net Profit</h6>
+            <h3 id="profitCounter">0</h3>
         </div>
     </div>
 
     <div class="col-md-4">
-        <div class="card shadow">
-            <div class="card-body">
-                <h5>Net Profit</h5>
-                <h3>KSh {{ net_profit }}</h3>
-            </div>
+        <div class="card p-4">
+            <h6>Cost per Litre</h6>
+            <h3 id="costCounter">0</h3>
         </div>
-    </div>
-
-    <div class="mt-5">
-    <h4>Strategic Outlook</h4>
-    <p>
-        Njuwan Farm operates a diversified mixed dairy system with scalable
-        vertical integration potential into yoghurt processing and feed sales.
-        Current ERP-backed tracking ensures cost-per-litre transparency,
-        profitability monitoring, and data-driven expansion planning.
-    </p>
     </div>
 
 </div>
 
-<hr class="my-4">
+<canvas id="milkChart"></canvas>
 
-<h4>Operational Controls</h4>
+<script>
+let ctx = document.getElementById('milkChart').getContext('2d');
 
-<a href="/add_cow" class="btn btn-outline-success">Add Cow</a>
-<a href="/add_milk" class="btn btn-outline-primary">Add Milk Record</a>
-<a href="/add_transaction" class="btn btn-outline-dark">Add Transaction</a>
-<a href="/progress" class="btn btn-outline-warning">System Progress</a>
-<a href="/analytics" class="btn btn-success">View Analytics</a>
-<a href="/projection" class="btn btn-dark">View 3-Year Projection</a>
-<a href="/feed-efficiency" class="btn btn-info">Feed Cost Simulator</a>
-<a href="/cow_efficiency" class="btn btn-secondary">Cow Efficiency Ranking</a>
-<a href="/yoghurt" class="btn btn-primary">Yoghurt Dashboard</a>
-<a href="/valuation" class="btn btn-warning">Farm Valuation</a>
+let milkChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+        datasets: [{
+            label: 'Milk Production',
+            data: [12, 19, 14, 25, 22, 30],
+            borderColor: '#ffffff',
+            tension: 0.4
+        }]
+    },
+    options: {
+        animation: {
+            duration: 2000
+        },
+        plugins: {
+            legend: {
+                labels: { color: 'white' }
+            }
+        },
+        scales: {
+            x: { ticks: { color: 'white' }},
+            y: { ticks: { color: 'white' }}
+        }
+    }
+});
+</script>
+
+<h4 class="mb-4">Farm Intelligence Modules</h4>
+
+<div class="row g-4">
+
+    <div class="col-md-3">
+        <a href="/analytics" class="text-decoration-none">
+            <div class="card p-3">
+                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800" class="img-fluid mb-3 rounded shadow">
+                <h6>Dairy Analytics</h6>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="/add_cow" class="text-decoration-none">
+            <div class="card p-3">
+                <img src="{{ url_for('static', filename='images/cow.jpg') }}" class="img-fluid mb-3 rounded shadow">
+                <h6>Add Cow</h6>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="/add_milk" class="text-decoration-none">
+            <div class="card p-3">
+                <img src="{{ url_for('static', filename='images/milk.jpg') }}" class="img-fluid mb-3 rounded">
+                <h6>Add Milk Record</h6>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="/add_transaction" class="text-decoration-none">
+            <div class="card p-3">
+                <img src="{{ url_for('static', filename='images/finance.jpg') }}" class="img-fluid mb-3 rounded">
+                <h6>Add Transaction</h6>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="/add_crop" class="text-decoration-none">
+            <div class="card p-3">
+                <img src="{{ url_for('static', filename='images/crop.jpg') }}" class="img-fluid mb-3 rounded">
+                <h6>Add Crop</h6>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="/add_feed" class="text-decoration-none">
+            <div class="card p-3">
+                <img src="{{ url_for('static', filename='images/feed.jpg') }}" class="img-fluid mb-3 rounded">
+                <h6>Add Feed Entry</h6>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="/feed-efficiency" class="text-decoration-none">
+            <div class="card p-3">
+                <img src="{{ url_for('static', filename='images/feed.jpg') }}" class="img-fluid mb-3 rounded">
+                <h6>Feed Cost Simulator</h6>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="/projection" class="text-decoration-none">
+            <div class="card p-3">
+                <img src="{{ url_for('static', filename='images/growth.jpg') }}" class="img-fluid mb-3 rounded">
+                <h6>3-Year Projection</h6>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="/cow_efficiency" class="text-decoration-none">
+            <div class="card p-3">
+                <img src="{{ url_for('static', filename='images/cow.jpg') }}" class="img-fluid mb-3 rounded">
+                <h6>Cow Efficiency Ranking</h6>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="/yoghurt" class="text-decoration-none">
+            <div class="card p-3">
+                <img src="{{ url_for('static', filename='images/yoghurt.jpg') }}" class="img-fluid mb-3 rounded">
+                <h6>Yoghurt Dashboard</h6>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="/valuation" class="text-decoration-none">
+            <div class="card p-3">
+                <img src="{{ url_for('static', filename='images/finance.jpg') }}" class="img-fluid mb-3 rounded">
+                <h6>Farm Valuation</h6>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="/progress" class="text-decoration-none">
+            <div class="card p-3">
+                <img src="{{ url_for('static', filename='images/dashboard.jpg') }}" class="img-fluid mb-3 rounded">
+                <h6>System Progress</h6>
+            </div>
+        </a>
+    </div>
+
+</div>
+
+<script>
+function animateValue(id, start, end, duration) {
+    let range = end - start;
+    let current = start;
+    let increment = end > start ? 1 : -1;
+    let stepTime = Math.abs(Math.floor(duration / range));
+    let obj = document.getElementById(id);
+
+    let timer = setInterval(function() {
+        current += increment;
+        obj.innerHTML = current;
+        if (current == end) {
+            clearInterval(timer);
+        }
+    }, stepTime);
+}
+
+animateValue("milkCounter", 0, {{ total_milk }}, 1000);
+animateValue("profitCounter", 0, {{ net_profit }}, 1000);
+animateValue("costCounter", 0, {{ cost_per_litre }}, 1000);
+</script>
 
 {% endblock %}

@@ -5,13 +5,14 @@ from database import db
 from datetime import datetime
 from version import increment_version
 from project_state import load_state
-from models import MilkProduction, Transaction, Cow
+from models import MilkProduction, Transaction, Cow, Crop, Feed
 from analytics import monthly_milk_data, revenue_vs_expense, cow_profitability, crop_roi_analysis
 from projection import three_year_projection
 from analytics import feed_efficiency_model
 from analytics import cow_feed_efficiency
 from yoghurt_engine import yoghurt_profit_analysis
 from valuation_engine import farm_valuation
+from flask import jsonify
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -28,7 +29,6 @@ print(f"Njuwan Farm ERP Version: {current_version}")
 
 with app.app_context():
     db.create_all()
-
 
 # ======================
 # DASHBOARD
@@ -50,7 +50,6 @@ def dashboard():
         net_profit=net_profit
     )
 
-
 # ======================
 # ADD COW
 # ======================
@@ -59,7 +58,7 @@ def dashboard():
 def add_cow():
     if request.method == "POST":
         cow = Cow(
-            tag_number=request.form["tag"],
+            tag_number=request.form["tag_number"],
             breed=request.form["breed"],
             birth_date=datetime.strptime(request.form["birth"], "%Y-%m-%d"),
             status=request.form["status"]
@@ -138,7 +137,7 @@ def feed_efficiency():
     data = feed_efficiency_model()
     return render_template("feed_efficiency.html", data=data)
 
-@app.route("/cow-efficiency")
+@app.route("/cow_efficiency")
 def cow_efficiency():
     data = cow_feed_efficiency()
     return render_template("cow_efficiency.html", data=data)
@@ -152,6 +151,49 @@ def yoghurt_dashboard():
 def valuation_dashboard():
     data = farm_valuation()
     return render_template("valuation.html", data=data)
+
+@app.route('/add_crop', methods=['GET', 'POST'])
+def add_crop():
+    if request.method == 'POST':
+        # Your logic to save the crop to the database
+        crop = Crop(
+            id=request.form["tag"],
+            name=request.form["crop"],
+            acreage=float(request.form["acre"]),
+            planting_date=datetime.strptime(request.form["planting_date"], "%Y-%m-%d")
+        )
+        db.session.add(crop)
+        db.session.commit()
+        return redirect("/")
+    return render_template('add_crop.html')
+
+@app.route('/add_feed', methods=['GET', 'POST'])
+def add_feed_entry():  # Unique name to avoid AssertionError
+    if request.method == 'POST':
+        # Data cleaning and validation logic
+        tag = request.form.get('tag_number')
+        feed_type = request.form.get('feed_type')
+        quantity = float(request.form.get('quantity'))
+        cost = float(request.form.get('cost'))
+        
+        # Save to database (assumes you have a Feed model)
+        new_feed = Feed(tag_number=tag, f_type=feed_type, qty=quantity, cost=cost)
+        db.session.add(new_feed)
+        db.session.commit()
+        return redirect("/")  # Redirect to dashboard or feed list after adding        
+    return render_template('add_feed.html')
+
+@app.route("/api/kpis")
+def api_kpis():
+    total_milk = db.session.query(db.func.sum(MilkProduction.litres)).scalar() or 0
+    total_income = db.session.query(db.func.sum(Transaction.amount)).filter_by(type="Income").scalar() or 0
+    total_expense = db.session.query(db.func.sum(Transaction.amount)).filter_by(type="Expense").scalar() or 0
+    
+    return jsonify({
+        "milk": total_milk,
+        "income": total_income,
+        "expense": total_expense
+    })
 
 if __name__ == "__main__":
     app.run(debug=True)

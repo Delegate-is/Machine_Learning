@@ -38,7 +38,7 @@ class Crop(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     acreage = db.Column(db.Float)
-    season = db.Column(db.String(50))
+    planting_date = db.Column(db.Date)
 
 
 class CropCost(db.Model):
@@ -78,7 +78,7 @@ class Transaction(db.Model):
     category = db.Column(db.String(100))
     amount = db.Column(db.Float)
     type = db.Column(db.String(10))  # income / expense
-    
+
 class FeedType(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
@@ -98,3 +98,11 @@ class YoghurtProduction(db.Model):
     selling_price_per_cup = db.Column(db.Float)
     processing_cost = db.Column(db.Float)
     packaging_cost = db.Column(db.Float)
+    
+class Feed(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    tag_number = db.Column(db.String(50))
+    f_type = db.Column(db.String(100))
+    qty = db.Column(db.Float)
+    cost = db.Column(db.Float)
+    date = db.Column(db.Date, default=datetime.utcnow)
