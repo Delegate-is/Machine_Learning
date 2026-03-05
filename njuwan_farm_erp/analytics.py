@@ -1,7 +1,8 @@
 from models import MilkProduction, Transaction, Cow
 from database import db
 from sqlalchemy import extract, func
-from models import Crop, CropCost, CropYield
+from models import Crop #CropCost, CropYield, FeedConsumption, FeedType
+from models import Feed, MilkProduction, Cow 
 
 def monthly_milk_data():
     data = db.session.query(
@@ -35,7 +36,7 @@ def cow_profitability():
     results.sort(key=lambda x: x["milk"], reverse=True)
     return results
 
-def crop_roi_analysis():
+"""def crop_roi_analysis():
     crops = Crop.query.all()
     results = []
 
@@ -53,23 +54,22 @@ def crop_roi_analysis():
         })
 
     return results
+"""
 
 def feed_efficiency_model():
-    from models import FeedConsumption, FeedType, MilkProduction, Cow
+    from models import Feed, MilkProduction
+    from sqlalchemy import func
 
-    total_feed_cost = 0
+    # Calculate total milk once
     total_milk = db.session.query(func.sum(MilkProduction.litres)).scalar() or 0
-
-    consumptions = db.session.query(FeedConsumption).all()
-
-    for record in consumptions:
-        feed = db.session.get(FeedType, record.feed_id)
-        if feed:
-            total_feed_cost += record.quantity_kg * feed.cost_per_kg
+    
+    # Calculate total feed cost in one query
+    all_feed = Feed.query.all()
+    total_feed_cost = sum(record.total_cost for record in all_feed)
 
     cost_per_litre_feed = (total_feed_cost / total_milk) if total_milk > 0 else 0
 
-    # Sensitivity: 5% feed cost reduction
+    # Sensitivity: 5% feed cost reduction logic
     reduced_cost = total_feed_cost * 0.95
     improved_cost_per_litre = (reduced_cost / total_milk) if total_milk > 0 else 0
 
@@ -78,30 +78,28 @@ def feed_efficiency_model():
         "feed_cost_per_litre": round(cost_per_litre_feed, 2),
         "optimized_cost_per_litre": round(improved_cost_per_litre, 2)
     }
-    
+
 def cow_feed_efficiency():
-    from models import FeedConsumption, MilkProduction, Cow, FeedType
+    # Update these imports to match your actual model names
 
     cows = Cow.query.all()
     results = []
 
     for cow in cows:
+        # Filter by cow.id to match the Foreign Key relationship
         milk_total = db.session.query(func.sum(MilkProduction.litres)).filter_by(cow_id=cow.id).scalar() or 0
         
-        feed_records = db.session.query(FeedConsumption).filter_by(cow_id=cow.id).all()
-        total_feed = 0
-
-        for record in feed_records:
-            feed = db.session.get(FeedType, record.feed_id)
-            if feed:
-                total_feed += record.quantity_kg
+        # Use 'Feed' instead of 'FeedConsumption'
+        feed_records = Feed.query.filter_by(cow_id=cow.id).all()
+        total_feed = sum(record.qty for record in feed_records) # Use 'qty' as per your Feed model
 
         efficiency = (milk_total / total_feed) if total_feed > 0 else 0
 
         results.append({
             "cow": cow.tag_number,
-            "milk": milk_total,
-            "feed_kg": total_feed,
+            "name": cow.name,
+            "milk": round(milk_total, 2),
+            "feed_kg": round(total_feed, 2),
             "efficiency": round(efficiency, 2)
         })
 

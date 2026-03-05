@@ -7,8 +7,15 @@
     </div>
     <form method="POST">
         <div class="mb-3">
-            <label>Cow Tag Number</label>
-            <input type="text" name="tag_number" class="form-control" required>
+            <label for="cow_id" class="form-label">Select Cow (Name & Tag)</label>
+            <select class="form-control" name="cow_id" required>
+                <option value="" disabled selected>-- Select the cow you are feeding --</option>
+                {% for cow in cows %}
+                <option value="{{ cow.id }}">
+                    {{ cow.name if cow.name else "Unnamed" }} | Tag: {{ cow.tag_number }} ({{ cow.breed }})
+                </option>
+                {% endfor %}
+            </select>
         </div>
         <div class="mb-3">
             <label>Feed Type (e.g., Silage, Concentrates)</label>

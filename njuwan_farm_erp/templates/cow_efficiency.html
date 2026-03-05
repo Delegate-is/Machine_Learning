@@ -11,6 +11,7 @@
     <thead>
         <tr>
             <th>Cow</th>
+            <th>Name</th>
             <th>Total Milk</th>
             <th>Total Feed (kg)</th>
             <th>Litres per kg Feed</th>
@@ -20,6 +21,7 @@
         {% for cow in data %}
         <tr>
             <td>{{ cow.cow }}</td>
+            <td>{{ cow.name }}</td>
             <td>{{ cow.milk }}</td>
             <td>{{ cow.feed_kg }}</td>
             <td>{{ cow.efficiency }}</td>

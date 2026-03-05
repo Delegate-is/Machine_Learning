@@ -1,18 +1,19 @@
 # pip install -r requirements.txt
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 from config import Config
 from database import db
 from datetime import datetime
 from version import increment_version
 from project_state import load_state
 from models import MilkProduction, Transaction, Cow, Crop, Feed
-from analytics import monthly_milk_data, revenue_vs_expense, cow_profitability, crop_roi_analysis
+from analytics import monthly_milk_data, revenue_vs_expense, cow_profitability # crop_roi_analysis
 from projection import three_year_projection
 from analytics import feed_efficiency_model
 from analytics import cow_feed_efficiency
 from yoghurt_engine import yoghurt_profit_analysis
 from valuation_engine import farm_valuation
 from flask import jsonify
+from flask_migrate import Migrate
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -23,6 +24,10 @@ db.init_app(app)
 with app.app_context():
     # This creates the tables based on tag_number and other fields in models.py
     db.create_all()
+migrate = Migrate(app, db)
+#flask db init
+#flask db migrate -m "added planting_date"
+#flask db upgrade  
 
 current_version = increment_version()
 print(f"Njuwan Farm ERP Version: {current_version}")
@@ -59,6 +64,7 @@ def add_cow():
     if request.method == "POST":
         cow = Cow(
             tag_number=request.form["tag_number"],
+            name=request.form["name"],
             breed=request.form["breed"],
             birth_date=datetime.strptime(request.form["birth"], "%Y-%m-%d"),
             status=request.form["status"]
@@ -115,7 +121,7 @@ def analytics_dashboard():
     months, milk_totals = monthly_milk_data()
     income, expense = revenue_vs_expense()
     cow_rank = cow_profitability()
-    crop_data = crop_roi_analysis()
+    #crop_data = crop_roi_analysis()
 
     return render_template(
         "analytics.html",
@@ -124,7 +130,7 @@ def analytics_dashboard():
         income=income,
         expense=expense,
         cow_rank=cow_rank,
-        crop_data=crop_data,
+        # crop_data=crop_data
     )
 
 @app.route("/projection")
@@ -171,17 +177,20 @@ def add_crop():
 def add_feed_entry():  # Unique name to avoid AssertionError
     if request.method == 'POST':
         # Data cleaning and validation logic
-        tag = request.form.get('tag_number')
+        cow_id = request.form.get('cow_id')
         feed_type = request.form.get('feed_type')
         quantity = float(request.form.get('quantity'))
         cost = float(request.form.get('cost'))
-        
-        # Save to database (assumes you have a Feed model)
-        new_feed = Feed(tag_number=tag, f_type=feed_type, qty=quantity, cost=cost)
-        db.session.add(new_feed)
-        db.session.commit()
-        return redirect("/")  # Redirect to dashboard or feed list after adding        
-    return render_template('add_feed.html')
+        if cow_id:
+            # Save to database (assumes you have a Feed model
+            new_feed = Feed(cow_id=cow_id, f_type=feed_type, qty=quantity, cost=cost)
+            db.session.add(new_feed)
+            db.session.commit()
+            return redirect('/')# Redirect to dashboard or feed list after adding     
+
+    # Fetch all cows so you can pick them by name/tag in the UI
+    all_cows = Cow.query.all()
+    return render_template('add_feed.html', cows=all_cows)
 
 @app.route("/api/kpis")
 def api_kpis():
