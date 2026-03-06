@@ -96,19 +96,10 @@ let milkChart = new Chart(ctx, {
     </div>
 
     <div class="col-md-3">
-        <a href="/add_transaction" class="text-decoration-none">
+        <a href="/cow_efficiency" class="text-decoration-none">
             <div class="card p-3">
-                <img src="{{ url_for('static', filename='images/finance.jpg') }}" class="img-fluid mb-3 rounded">
-                <h6>Add Transaction</h6>
-            </div>
-        </a>
-    </div>
-
-    <div class="col-md-3">
-        <a href="/add_crop" class="text-decoration-none">
-            <div class="card p-3">
-                <img src="{{ url_for('static', filename='images/crop.jpg') }}" class="img-fluid mb-3 rounded">
-                <h6>Add Crop</h6>
+                <img src="{{ url_for('static', filename='images/cow.jpg') }}" class="img-fluid mb-3 rounded">
+                <h6>Cow Efficiency Ranking</h6>
             </div>
         </a>
     </div>
@@ -132,19 +123,28 @@ let milkChart = new Chart(ctx, {
     </div>
 
     <div class="col-md-3">
-        <a href="/projection" class="text-decoration-none">
+        <a href="/add_crop" class="text-decoration-none">
             <div class="card p-3">
-                <img src="{{ url_for('static', filename='images/growth.jpg') }}" class="img-fluid mb-3 rounded">
-                <h6>3-Year Projection</h6>
+                <img src="{{ url_for('static', filename='images/crop.jpg') }}" class="img-fluid mb-3 rounded">
+                <h6>Add Crop</h6>
             </div>
         </a>
     </div>
 
     <div class="col-md-3">
-        <a href="/cow_efficiency" class="text-decoration-none">
+        <a href="/add_transaction" class="text-decoration-none">
             <div class="card p-3">
-                <img src="{{ url_for('static', filename='images/cow.jpg') }}" class="img-fluid mb-3 rounded">
-                <h6>Cow Efficiency Ranking</h6>
+                <img src="{{ url_for('static', filename='images/finance.jpg') }}" class="img-fluid mb-3 rounded">
+                <h6>Add Transaction</h6>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="/projection" class="text-decoration-none">
+            <div class="card p-3">
+                <img src="{{ url_for('static', filename='images/growth.jpg') }}" class="img-fluid mb-3 rounded">
+                <h6>3-Year Projection</h6>
             </div>
         </a>
     </div>

@@ -15,6 +15,7 @@
             <th>Total Milk</th>
             <th>Total Feed (kg)</th>
             <th>Litres per kg Feed</th>
+            <th>Status</th> <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -25,7 +26,20 @@
             <td>{{ cow.milk }}</td>
             <td>{{ cow.feed_kg }}</td>
             <td>{{ cow.efficiency }}</td>
+
+            <td>
+                {% if cow.status == 'Active' or cow.status == 'Lactating' %}
+                <span class="badge bg-success">{{ cow.status }}</span>
+                {% elif cow.status == 'Quarantined' %}
+                <span class="badge bg-danger">{{ cow.status }}</span>
+                {% elif cow.status == 'Dry' %}
+                <span class="badge bg-warning text-dark">{{ cow.status }}</span>
+                {% else %}
+                <span class="badge bg-secondary">{{ cow.status }}</span>
+                {% endif %}
+            </td>
         </tr>
+
         {% endfor %}
     </tbody>
 </table>

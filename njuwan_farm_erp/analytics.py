@@ -100,7 +100,8 @@ def cow_feed_efficiency():
             "name": cow.name,
             "milk": round(milk_total, 2),
             "feed_kg": round(total_feed, 2),
-            "efficiency": round(efficiency, 2)
+            "efficiency": round(efficiency, 2),
+            "status": cow.status
         })
 
     results.sort(key=lambda x: x["efficiency"], reverse=True)

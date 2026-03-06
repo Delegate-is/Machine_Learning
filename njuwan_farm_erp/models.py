@@ -53,16 +53,23 @@ class Cow(db.Model):
     breed = db.Column(db.String(50))
     birth_date = db.Column(db.Date)
     age = db.Column(db.Integer)
-    status = db.Column(db.String(50))  # Lactating / Dry / Sold
     farm_id = db.Column(db.Integer, db.ForeignKey("farms.id"))
     # ... other fields ...
+    # Advanced Tracking Fields
+    weight_kg = db.Column(db.Float) # Useful for health monitoring
+    status = db.Column(db.String(50), default="Active") # Active, Quarantined, Sold, Dry, Lactating
+
+    @property
+    def age_in_years(self):
+        from datetime import date
+        if self.date_of_birth:
+            return (date.today() - self.date_of_birth).days // 365
+        return "Unknown"
 
     # Define the relationship ONLY ONCE. 
     # backref="cow" automatically creates a 'cow' attribute on the Feed object.
     feed_records = db.relationship("Feed", backref="cow", lazy=True)
-    milk_records = db.relationship("MilkProduction", backref="cow", lazy=True)
-
-
+    milk_records = db.relationship("MilkProduction", backref="cow", lazy='dynamic')
 
 
 # ===============================
@@ -77,6 +84,10 @@ class MilkProduction(db.Model):
     cow_id = db.Column(db.Integer, db.ForeignKey("cows.id"))
 
     litres = db.Column(db.Float)
+    
+    # Advanced Production Fields
+    session = db.Column(db.String(10)) # AM, PM, or Noon
+    temperature = db.Column(db.Float) # Milk temperature for quality control
     date = db.Column(db.DateTime, default=datetime.utcnow)
 
 

@@ -1,4 +1,5 @@
 # pip install -r requirements.txt
+# flask --app app run --debug
 from flask import Flask, render_template, request, redirect, url_for
 from config import Config
 from database import db
@@ -59,39 +60,52 @@ def dashboard():
 # ADD COW
 # ======================
 
-@app.route("/add_cow", methods=["GET", "POST"])
+@app.route('/add_cow', methods=['GET', 'POST'])
 def add_cow():
-    if request.method == "POST":
+    if request.method == 'POST':
+        # Prevent ValueError by checking if date exists before parsing
+        raw_date = request.form.get("birth_date")
+        birth_date = None
+        if raw_date:
+            try:
+                birth_date = datetime.strptime(raw_date, '%Y-%m-%d').date()
+            except ValueError:
+                birth_date = None
+
         cow = Cow(
-            tag_number=request.form["tag_number"],
-            name=request.form["name"],
-            breed=request.form["breed"],
-            birth_date=datetime.strptime(request.form["birth"], "%Y-%m-%d"),
-            status=request.form["status"]
+            tag_number=request.form.get("tag_number"),
+            name=request.form.get("name"),
+            breed=request.form.get("breed"),
+            status=request.form.get("status", "Active"),
+            weight_kg=float(request.form.get("weight_kg") or 0),
+            birth_date=birth_date
         )
+        
         db.session.add(cow)
         db.session.commit()
-        return redirect("/")
-    return render_template("add_cow.html")
+        return redirect('/')
+    return render_template('add_cow.html')
 
 
-# ======================
+# =================b=====
 # ADD MILK RECORD
 # ======================
 
-@app.route("/add_milk", methods=["GET", "POST"])
+@app.route('/add_milk', methods=['GET', 'POST'])
 def add_milk():
-    if request.method == "POST":
+    if request.method == 'POST':
         milk = MilkProduction(
-            cow_id=request.form["cow_id"],
-            litres=float(request.form["litres"]),
-            date=datetime.now()
+            cow_id=request.form.get("cow_id"),
+            litres=float(request.form.get("litres")),
+            session=request.form.get("session"), # AM/PM
+            date=datetime.utcnow()
         )
         db.session.add(milk)
         db.session.commit()
-        return redirect("/")
+        return redirect('/')
+    
     cows = Cow.query.all()
-    return render_template("add_milk.html", cows=cows)
+    return render_template('add_milk.html', cows=cows)
 
 
 # ======================
