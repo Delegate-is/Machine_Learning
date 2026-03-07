@@ -32,6 +32,30 @@
         </div>
     </div>
 
+</div>
+<!--
+<div class="row">
+
+<div class="col-md-3">
+<div class="card">
+<div class="card-body">
+<h5>Total Cows</h5>
+<h2>{{ cows }}</h2>
+</div>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card">
+<div class="card-body">
+<h5>Total Milk</h5>
+<h2>{{ milk }} L</h2>
+</div>
+</div>
+</div>
+
+</div> -->
+
     <div class="mt-5">
     <h4>Strategic Outlook</h4>
     <p>
@@ -58,5 +82,41 @@
 <a href="/cow_efficiency" class="btn btn-secondary">Cow Efficiency Ranking</a>
 <a href="/yoghurt" class="btn btn-primary">Yoghurt Dashboard</a>
 <a href="/valuation" class="btn btn-warning">Farm Valuation</a>
+
+<canvas id="milkChart"></canvas>
+
+    Below are the intelligence module cards linking to various functionalities of the ERP system.
+    Each card has an image and a title, and they are arranged in a responsive grid layout.
+
+<script>
+let ctx = document.getElementById('milkChart').getContext('2d');
+
+let milkChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+        datasets: [{
+            label: 'Milk Production',
+            data: [12, 19, 14, 25, 22, 30],
+            borderColor: '#ffffff',
+            tension: 0.4
+        }]
+    },
+    options: {
+        animation: {
+            duration: 2000
+        },
+        plugins: {
+            legend: {
+                labels: { color: 'white' }
+            }
+        },
+        scales: {
+            x: { ticks: { color: 'white' }},
+            y: { ticks: { color: 'white' }}
+        }
+    }
+});
+</script>
 
 {% endblock %}

@@ -26,8 +26,10 @@
             <label class="form-label">Milking Session</label>
             <select class="form-control" name="session">
                 <option value="AM">Morning (AM)</option>
+                <option value="NOON">Noon (NOON)</option>
                 <option value="PM">Evening (PM)</option>
             </select>
+            <input type="number" step="0.1" name="temperature" placeholder="Milk Temp (°C)" class="form-control">
         </div>
     </div>
     <button type="submit" class="btn btn-success">Save Production Record</button>

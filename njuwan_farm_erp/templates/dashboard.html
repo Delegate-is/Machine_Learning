@@ -6,63 +6,56 @@
     <p>Integrated Dairy, Crop & Financial Intelligence System</p>
 </div>
 
-<div class="row text-center mb-5">
+<div class="row">
 
     <div class="col-md-4">
-        <div class="card p-4">
-            <h6>Total Milk</h6>
-            <h3 id="milkCounter">0</h3>
+        <div class="card shadow">
+            <div class="card-body">
+                <h5>Total Cows</h5>
+                <h2>{{ cows }}</h2>
+            </div>
         </div>
     </div>
 
     <div class="col-md-4">
-        <div class="card p-4">
-            <h6>Net Profit</h6>
-            <h3 id="profitCounter">0</h3>
+        <div class="card shadow">
+            <div class="card-body">
+                <h5>Total Milk</h5>
+                <h2>{{ milk }} L</h2>
+            </div>
         </div>
     </div>
 
     <div class="col-md-4">
-        <div class="card p-4">
-            <h6>Cost per Litre</h6>
-            <h3 id="costCounter">0</h3>
+        <div class="card shadow">
+            <div class="card-body">
+                <h5>Cost Per Litre</h5>
+                <h3>KSh {{ cost_per_litre }}</h3>
+            </div>
         </div>
     </div>
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <canvas id="milkChart"></canvas>
 
 <script>
-let ctx = document.getElementById('milkChart').getContext('2d');
+const ctx = document.getElementById('milkChart');
 
-let milkChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: ['Jan','Feb','Mar','Apr','May','Jun'],
-        datasets: [{
-            label: 'Milk Production',
-            data: [12, 19, 14, 25, 22, 30],
-            borderColor: '#ffffff',
-            tension: 0.4
-        }]
-    },
-    options: {
-        animation: {
-            duration: 2000
-        },
-        plugins: {
-            legend: {
-                labels: { color: 'white' }
-            }
-        },
-        scales: {
-            x: { ticks: { color: 'white' }},
-            y: { ticks: { color: 'white' }}
-        }
-    }
+new Chart(ctx, {
+type: 'bar',
+data: {
+labels: ['Milk', 'Feed Cost', 'Profit'],
+datasets: [{
+label: 'Farm Performance',
+data: [{{ milk }}, {{ feed_cost }}, {{ profit }}]
+}]
+}
 });
 </script>
+
 
 <h4 class="mb-4">Farm Intelligence Modules</h4>
 
@@ -91,6 +84,15 @@ let milkChart = new Chart(ctx, {
             <div class="card p-3">
                 <img src="{{ url_for('static', filename='images/milk.jpg') }}" class="img-fluid mb-3 rounded">
                 <h6>Add Milk Record</h6>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="/cow_profile" class="text-decoration-none">
+            <div class="card p-3">
+                <img src="{{ url_for('static', filename='images/feed.jpg') }}" class="img-fluid mb-3 rounded">
+                <h6>Cow Profile</h6>
             </div>
         </a>
     </div>
@@ -198,6 +200,72 @@ function animateValue(id, start, end, duration) {
 animateValue("milkCounter", 0, {{ total_milk }}, 1000);
 animateValue("profitCounter", 0, {{ net_profit }}, 1000);
 animateValue("costCounter", 0, {{ cost_per_litre }}, 1000);
+</script>
+
+<!--Ive added the new upcoming calving analytics at the bottom-->
+<div class="container fade-in">
+    {% if alerts %}
+    <div class="alert alert-warning border-0 mb-4" style="background: rgba(255, 193, 7, 0.2); color: #ffca28;">
+        <h5 class="mb-2">⚠️ Upcoming Calvings (Next 7 Days)</h5>
+        <ul class="mb-0">
+            {% for alert in alerts %}
+            <li><strong>{{ alert.cow.tag_number }}</strong> is due on {{ alert.expected_calving.strftime('%d %b') }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="d-flex justify-content-between mb-3">
+        <input type="text" id="cowSearch" class="form-control w-50 bg-transparent text-white" placeholder="Search herd..." onkeyup="filterTable()">
+        <button onclick="generatePDF()" class="btn btn-danger">📄 Download Report</button>
+    </div>
+
+    <div class="card p-4">
+        <table class="table table-hover text-white" id="cowTable">
+            <thead>
+                <tr>
+                    <th>Tag</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Total Milk (Ltrs)</th>
+                    <th>Next Calving</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cow, total in cows_with_totals %}
+                <tr>
+                    <td><strong>{{ cow.tag_number }}</strong></td>
+                    <td>{{ cow.name }}</td>
+                    <td>{{ cow.status }}</td>
+                    <td class="text-info fw-bold">{{ total or 0 }} L</td>
+                    <td>
+                        {% for breed in cow.breeding_records %}
+                            {{ breed.expected_calving }}
+                        {% else %} No active record {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function generatePDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.text("Njuwan Farm - Herd Production Report", 14, 15);
+    doc.autoTable({ html: '#cowTable', startY: 20, theme: 'grid' });
+    doc.save("Njuwan_Production_Report.pdf");
+}
+
+function filterTable() {
+    let filter = document.getElementById("cowSearch").value.toLowerCase();
+    let rows = document.getElementById("cowTable").getElementsByTagName("tr");
+    for (let i = 1; i < rows.length; i++) {
+        rows[i].style.display = rows[i].innerText.toLowerCase().includes(filter) ? "" : "none";
+    }
+}
 </script>
 
 {% endblock %}

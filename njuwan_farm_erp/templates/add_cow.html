@@ -34,6 +34,27 @@
         </div>
     </div>
 
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label>Last Vaccination</label>
+            <input type="text" name="vaccine" class="form-control" placeholder="e.g. FMD">
+        </div>
+        <div class="col-md-6">
+            <label>Vaccination Date</label>
+            <input type="date" name="vaccination_date" class="form-control">
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label>Insemination Date</label>
+            <input type="date" name="insemination_date" class="form-control" id="ins_date">
+        </div>
+        <div class="col-md-6">
+            <label>Expectant Calving Date</label>
+            <input type="date" name="expected_calving" class="form-control" id="exp_date" readonly>
+        </div>
+    </div>
+
     <div class="mb-3">
         <label class="form-label">Status</label>
         <select class="form-control" name="status">
@@ -46,5 +67,23 @@
     </div>
     <button type="submit" class="btn btn-primary w-100">Register Cow</button>
 </form>
+
+<script>
+    document.querySelector('input[name="insemination_date"]').addEventListener('change', function() {
+        const inseminationDate = new Date(this.value);
+        if (!isNaN(inseminationDate.getTime())) {
+            // Add 283 days to the insemination date
+            inseminationDate.setDate(inseminationDate.getDate() + 283);
+            
+            // Format the date to YYYY-MM-DD for the input field
+            const year = inseminationDate.getFullYear();
+            const month = String(inseminationDate.getMonth() + 1).padStart(2, '0');
+            const day = String(inseminationDate.getDate()).padStart(2, '0');
+            
+            const expectedDate = `${year}-${month}-${day}`;
+            document.querySelector('input[name="expected_calving"]').value = expectedDate;
+        }
+    });
+</script>
 
 {% endblock %}

@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from database import db
 from datetime import datetime
+from datetime import date
 
 
 # ===============================
@@ -38,8 +39,6 @@ class Farm(db.Model):
     cows = db.relationship("Cow", backref="farm")
     crops = db.relationship("Crop", backref="farm")
 
-
-
 # ===============================
 # COWS
 # ===============================
@@ -70,7 +69,39 @@ class Cow(db.Model):
     # backref="cow" automatically creates a 'cow' attribute on the Feed object.
     feed_records = db.relationship("Feed", backref="cow", lazy=True)
     milk_records = db.relationship("MilkProduction", backref="cow", lazy='dynamic')
+    health_records = db.relationship('HealthRecord', backref='cow', lazy=True)
+    vaccinations = db.relationship('Vaccination', backref='cow', lazy=True)
+    breeding_records = db.relationship('Breeding', backref='cow', lazy=True)
+    
+class HealthRecord(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    cow_id = db.Column(db.Integer, db.ForeignKey('cows.id'))
+    disease = db.Column(db.String(100))
+    treatment = db.Column(db.String(200))
+    vet_name = db.Column(db.String(100))
+    date = db.Column(db.Date, default=datetime.utcnow) # Automatically stamps entry date
 
+class Vaccination(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    cow_id = db.Column(db.Integer, db.ForeignKey('cows.id'))
+    vaccine = db.Column(db.String(100))
+    due_date = db.Column(db.Date)
+    status = db.Column(db.String(20), default="Pending") # Matches your HTML badges
+
+class Breeding(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    cow_id = db.Column(db.Integer, db.ForeignKey('cows.id'))
+    insemination_date = db.Column(db.Date)
+    bull = db.Column(db.String(50))
+    pregnancy_status = db.Column(db.String(20), default="Unknown")
+    expected_calving = db.Column(db.Date) # Calculated via your app.py logic
+    
+    @property
+    def days_remaining(self):
+        if self.expected_calving:
+            delta = self.expected_calving - date.today()
+            return delta.days if delta.days > 0 else 0
+        return None
 
 # ===============================
 # MILK PRODUCTION
@@ -89,6 +120,10 @@ class MilkProduction(db.Model):
     session = db.Column(db.String(10)) # AM, PM, or Noon
     temperature = db.Column(db.Float) # Milk temperature for quality control
     date = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def is_quality_standard(self):
+        # Example: Normal fresh milk temp is usually 35-38°C at milking
+        return 34.0 <= self.temperature <= 39.0
 
 
 

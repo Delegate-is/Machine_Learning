@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-dark border-danger text-white p-3 shadow-sm">
+            <div class="d-flex align-items-center">
+                <div class="rounded-circle bg-danger p-3 me-3">
+                    <i class="fas fa-stethoscope text-white"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0 text-muted">Total Health Incidents</h6>
+                    <h3 class="mb-0 text-danger">{{ total_incidents }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-dark border-warning text-white p-3 shadow-sm">
+            <div class="d-flex align-items-center">
+                <div class="rounded-circle bg-warning p-3 me-3">
+                    <i class="fas fa-syringe text-dark"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0 text-muted">Pending Vaccines</h6>
+                    <h3 class="mb-0 text-warning">{{ pending_vaccines }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-dark border-success text-white p-3 shadow-sm">
+            <div class="d-flex align-items-center">
+                <div class="rounded-circle bg-success p-3 me-3">
+                    <i class="fas fa-baby-carriage text-white"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0 text-muted">Active Pregnancies</h6>
+                    <h3 class="mb-0 text-success">{{ upcoming_calvings }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white">Herd Profiles & Intelligence</h2>
+        <div class="btn-group">
+            <button onclick="generateMedicalPDF()" class="btn btn-outline-info me-2">💉 Medical History PDF</button>
+            <button onclick="generatePDF()" class="btn btn-danger">📄 Export Full Report</button>
+        </div>
+    </div>
+
+    <div class="card p-4 mb-5">
+        <div class="mb-3">
+            <input type="text" id="cowSearch" class="form-control bg-transparent text-white" 
+                   placeholder="Search by Tag or Name..." onkeyup="filterTable()">
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover text-white" id="cowTable">
+                <thead>
+                    <tr style="border-bottom: 2px solid rgba(255,255,255,0.1);">
+                        <th>Tag</th>
+                        <th>Name</th>
+                        <th>Breed</th>
+                        <th>Status</th>
+                        <th>Medical Record</th>
+                        <th>Days to Calving</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cow in cows %}
+                    <tr>
+                        <td><strong>{{ cow.tag_number }}</strong></td>
+                        <td>{{ cow.name }}</td>
+                        <td>{{ cow.breed }}</td>
+                        <td>
+                            <span class="badge {% if cow.status|lower == 'lactating' %}bg-success{% else %}bg-secondary{% endif %}">
+                                {{ cow.status }}
+                            </span>
+                        </td>
+                        <td>
+                            {% for health in cow.health_records %}
+                                {{ health.disease }} ({{ health.date.strftime('%d/%m') }})<br>
+                            {% else %} Clean Bill {% endfor %}
+                        </td>
+                        <td>
+                            {% for breed in cow.breeding_records %}
+                                {% if breed.days_remaining is not none %}
+                                    Due: {{ breed.expected_calving }} (Days: {{ breed.days_remaining }})
+                                {% else %}
+                                    Not Expecting
+                                {% endif %}
+                            {% else %} Not Expecting {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-5 border-top pt-4">
+        <h3 class="text-white mb-4"><i class="fas fa-edit me-2"></i>Quick Update Console</h3>
+        <div class="row">
+            {% for cow in cows %}
+            <div class="col-xl-4 col-md-6 mb-4">
+                <div class="card bg-dark text-white border-secondary h-100" style="background: rgba(255, 255, 255, 0.05) !important; backdrop-filter: blur(10px);">
+                    <div class="card-header border-secondary d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-success">Tag: {{ cow.tag_number }}</span>
+                        <span class="badge bg-outline-info border border-info">{{ cow.name }}</span>
+                    </div>
+                    <div class="card-body">
+                        
+                        <form action="{{ url_for('add_health', cow_id=cow.id) }}" method="POST" class="mb-3 p-2 border-bottom border-secondary pb-3">
+                            <label class="small text-muted mb-1">Medical Record</label>
+                            <div class="input-group input-group-sm mb-2">
+                                <input type="text" name="disease" class="form-control bg-transparent text-white border-secondary" placeholder="Disease" required>
+                                <input type="text" name="treatment" class="form-control bg-transparent text-white border-secondary" placeholder="Treatment">
+                            </div>
+                            <div class="input-group input-group-sm">
+                                <input type="text" name="vet_name" class="form-control bg-transparent text-white border-secondary" placeholder="Vet Name">
+                                <button class="btn btn-outline-danger" type="submit">Log Health</button>
+                            </div>
+                        </form>
+
+                        <div class="mb-3 p-2 border-bottom border-secondary pb-3">
+                            <label class="small text-muted mb-2 d-block">Vaccination Status</label>
+                            <div class="mb-2">
+                                {% for vac in cow.vaccinations %}
+                                <div class="d-flex justify-content-between align-items-center mb-1 p-2 rounded" style="background: rgba(255,255,255,0.05);">
+                                    <div>
+                                        <small class="text-white d-block">{{ vac.vaccine }}</small>
+                                        <small class="text-muted" style="font-size: 0.75rem;">Due: {{ vac.due_date }}</small>
+                                    </div>
+                                    <a href="{{ url_for('toggle_vaccination', vac_id=vac.id) }}" 
+                                       class="badge {% if vac.status == 'Completed' %}bg-success{% else %}bg-warning text-dark{% endif %} text-decoration-none">
+                                        {{ vac.status }}
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <form action="{{ url_for('add_vaccination', cow_id=cow.id) }}" method="POST">
+                                <div class="input-group input-group-sm mb-2">
+                                    <input type="text" name="vaccine" class="form-control bg-transparent text-white border-secondary" placeholder="Vaccine Name" required>
+                                    <input type="date" name="due_date" class="form-control bg-transparent text-white border-secondary" required>
+                                </div>
+                                <button class="btn btn-sm btn-outline-info w-100" type="submit">Schedule Vaccine</button>
+                            </form>
+                        </div>
+
+                        <form action="{{ url_for('add_breeding', cow_id=cow.id) }}" method="POST" class="p-2">
+                            <label class="small text-muted mb-1">Breeding (Insemination)</label>
+                            <div class="input-group input-group-sm mb-2">
+                                <input type="date" name="insemination_date" class="form-control bg-transparent text-white border-secondary" required>
+                                <input type="text" name="bull" class="form-control bg-transparent text-white border-secondary" placeholder="Bull ID">
+                            </div>
+                            <button class="btn btn-sm btn-outline-warning w-100" type="submit">Register Breeding</button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+function filterTable() {
+    let filter = document.getElementById("cowSearch").value.toLowerCase();
+    let rows = document.getElementById("cowTable").getElementsByTagName("tr");
+    for (let i = 1; i < rows.length; i++) {
+        let text = rows[i].innerText.toLowerCase();
+        rows[i].style.display = text.includes(filter) ? "" : "none";
+    }
+}
+
+function generatePDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text("Njuwan Farm ERP - Full Herd Report", 14, 20);
+    doc.autoTable({ 
+        html: '#cowTable', 
+        startY: 30, 
+        theme: 'grid',
+        headStyles: { fillColor: [45, 106, 79] } 
+    });
+    doc.save("Njuwan_Full_Report.pdf");
+}
+
+function generateMedicalPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.setTextColor(45, 106, 79);
+    doc.text("Njuwan Farm: Medical & Vaccination History", 14, 20);
+    
+    let finalY = 30;
+
+    {% for cow in cows %}
+        let medicalRows = [];
+        {% for health in cow.health_records %}
+            medicalRows.push(["Health", "{{ health.date }}", "{{ health.disease }}", "{{ health.treatment }}", "{{ health.vet_name }}"]);
+        {% endfor %}
+        {% for vac in cow.vaccinations %}
+            medicalRows.push(["Vaccine", "{{ vac.due_date }}", "{{ vac.vaccine }}", "Status: {{ vac.status }}", "-"]);
+        {% endfor %}
+
+        if (medicalRows.length > 0) {
+            doc.setFontSize(12);
+            doc.setTextColor(0);
+            doc.text("Cow: {{ cow.tag_number }} - {{ cow.name }}", 14, finalY);
+            doc.autoTable({
+                startY: finalY + 5,
+                head: [['Type', 'Date', 'Issue/Vaccine', 'Treatment/Status', 'Vet']],
+                body: medicalRows,
+                theme: 'striped',
+                headStyles: { fillColor: [70, 70, 70] }
+            });
+            finalY = doc.lastAutoTable.finalY + 15;
+        }
+        if (finalY > 260) { doc.addPage(); finalY = 20; }
+    {% endfor %}
+
+    doc.save("Njuwan_Medical_History.pdf");
+}
+</script>
+{% endblock %}

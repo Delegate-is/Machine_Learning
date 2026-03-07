@@ -106,3 +106,14 @@ def cow_feed_efficiency():
 
     results.sort(key=lambda x: x["efficiency"], reverse=True)
     return results
+
+def get_monthly_report():
+    # This query sums up litres grouped by Year and Month
+    report = db.session.query(
+        extract('year', MilkProduction.date).label('year'),
+        extract('month', MilkProduction.date).label('month'),
+        func.sum(MilkProduction.litres).label('total_litres'),
+        func.avg(MilkProduction.temperature).label('avg_temp')
+    ).group_by('year', 'month').order_by('year', 'month').all()
+    
+    return report
