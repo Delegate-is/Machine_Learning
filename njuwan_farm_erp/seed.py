@@ -1,49 +1,89 @@
-from app import app, db, Cow, Feed, HealthRecord, Vaccination, Breeding
-from datetime import datetime, timedelta
+# python seed.py
+# flask --app app run --debug
 
-def seed_data():
+import random
+from datetime import datetime, timedelta
+from app import app, db
+from models import MilkProduction, Transaction, Cow, Vaccination, Breeding, Crop, Feed, HealthRecord
+
+def seed_database():
     with app.app_context():
-        # Optional: Clear data to start fresh and avoid "Unique Constraint" errors on Tag Numbers
-        db.drop_all() 
+        print("Clearing existing data...")
+        db.drop_all()
         db.create_all()
 
-        print("Seeding cows...")
-        cow1 = Cow(tag_number="001", name="Mariru", status="Lactating", breed="Holstein", weight_kg=550.0)
-        cow2 = Cow(tag_number="002", name="Doe", status="Dry", breed="Jersey", weight_kg=450.0)
-        cow3 = Cow(tag_number="003", name="Bossy", status="Quarantined", breed="Guernsey", weight_kg=500.0)
+        breeds = ['Holstein', 'Jersey', 'Guernsey', 'Ayrshire', 'Sahiwal']
+        statuses = ['Lactating', 'Dry', 'Quarantined', 'Sick']
+        diseases = ['Mastitis', 'Foot Rot', 'Milk Fever', 'Bloat']
+        feed_types = ['Silage', 'Dairy Meal', 'Napier Grass', 'Hay']
+
+        print("Adding 30 cows and records...")
         
-        db.session.add_all([cow1, cow2, cow3])
-        db.session.flush() # Flush to get IDs for the linked records
+        for i in range(1, 31):
+            # 1. Create Cow
+            tag = f"{i:03d}"
+            cow = Cow(
+                tag_number=tag,
+                name=f"Cow_{tag}",
+                breed=random.choice(breeds),
+                status=random.choice(statuses)
+            )
+            db.session.add(cow)
+            db.session.flush() # Get cow.id for relationships
 
-        print("Seeding Health & Medical records...")
-        h1 = HealthRecord(cow_id=cow1.id, disease="Mastitis", treatment="Antibiotics", vet_name="Dr. Kamau", date=datetime.utcnow().date())
-        h2 = HealthRecord(cow_id=cow3.id, disease="Foot Rot", treatment="Cleaning & Zinc", vet_name="Dr. Njoroge", date=datetime.utcnow().date())
+            # 2. Add Milk Records (Last 7 days)
+            for d in range(7):
+                date_point = datetime.now() - timedelta(days=d)
+                # Randomize production between 15L and 35L
+                milk = MilkProduction(
+                    cow_id=cow.id,
+                    litres=round(random.uniform(15.0, 35.0), 2),
+                    date=date_point
+                )
+                db.session.add(milk)
 
-        print("Seeding Vaccination schedule...")
-        v1 = Vaccination(cow_id=cow1.id, vaccine="FMD", due_date=datetime.utcnow().date(), status="Completed")
-        v2 = Vaccination(cow_id=cow2.id, vaccine="Anthrax", due_date=(datetime.utcnow() + timedelta(days=30)).date(), status="Pending")
+            # 3. Add Feed Records (Last 7 days)
+            for d in range(7):
+                date_point = datetime.now() - timedelta(days=d)
+                feed = Feed(
+                    cow_id=cow.id,
+                    f_type=random.choice(feed_types),
+                    qty=round(random.uniform(5.0, 15.0), 1),
+                    date=date_point
+                )
+                db.session.add(feed)
 
-        print("Seeding Breeding & Calving data...")
-        # Testing the 283-day calculation logic
-        ins_date = datetime.utcnow().date() - timedelta(days=60)
-        exp_date = ins_date + timedelta(days=283)
-        
-        b1 = Breeding(
-            cow_id=cow1.id, 
-            insemination_date=ins_date, 
-            bull="Top-Sire-01", 
-            pregnancy_status="Confirmed", 
-            expected_calving=exp_date
-        )
+            # 4. Randomly add Health/Breeding records to trigger "Wellness Overview"
+            if i % 5 == 0:
+                health = HealthRecord(
+                    cow_id=cow.id,
+                    disease=random.choice(diseases),
+                    treatment="Antibiotics and rest",
+                    vet_name="Dr. Kariuki",
+                    date=datetime.now() - timedelta(days=random.randint(1, 10))
+                )
+                db.session.add(health)
 
-        print("Seeding feed records...")
-        f1 = Feed(cow_id=cow1.id, f_type="Dairy Meal", qty=10.0, cost=500, date=datetime.utcnow())
-        f2 = Feed(cow_id=cow2.id, f_type="Silage", qty=15.0, cost=300, date=datetime.utcnow())
-        
-        db.session.add_all([h1, h2, v1, v2, b1, f1, f2])
+            if i % 7 == 0:
+                breeding = Breeding(
+                    cow_id=cow.id,
+                    insemination_date=datetime.now() - timedelta(days=random.randint(30, 100)),
+                    bull="Elite_Bull_X",
+                    expected_calving=datetime.now() + timedelta(days=random.randint(100, 250))
+                )
+                db.session.add(breeding)
+
+            if i % 10 == 0:
+                vac = Vaccination(
+                    cow_id=cow.id,
+                    vaccine="Foot and Mouth",
+                    due_date=datetime.now() + timedelta(days=random.randint(5, 20)),
+                    status="Pending"
+                )
+                db.session.add(vac)
+
         db.session.commit()
-        
-        print("Database seeded successfully with all relationships!")
+        print("Success! 30 cows with milk, feed, and health records added.")
 
 if __name__ == "__main__":
-    seed_data()
+    seed_database()

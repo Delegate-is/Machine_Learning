@@ -1,58 +1,125 @@
 {% extends "base.html" %}
+
 {% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-white fw-bold">Herd Asset Valuation</h2>
+            <p class="text-white-50">Logistics & Asset Management by Arial Logistics</p>
+        </div>
+        <button class="btn btn-outline-success" onclick="generateValuationPDF()">
+            <i class="fas fa-file-invoice-dollar me-2"></i>Export Valuation PDF
+        </button>
+    </div>
 
-<h2 class="mb-4">Farm Enterprise Valuation</h2>
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card bg-dark border-success p-4 shadow">
+                <h6 class="text-white-50">Total Estimated Herd Value</h6>
+                <h1 class="text-success fw-bold">KES {{ "{:,.2f}".format(total_value) }}</h1>
+                <small class="text-white-50">Based on {{ count }} Active Heads</small>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-dark border-info p-4 shadow">
+                <h6 class="text-white-50">Average Value Per Head</h6>
+                <h2 class="text-info fw-bold">KES {{ "{:,.2f}".format(total_value / count if count > 0 else 0) }}</h2>
+            </div>
+        </div>
+    </div>
 
-<div class="mb-4">
-    <img src="https://source.unsplash.com/1200x400/?investment,farm" class="img-fluid rounded shadow">
+    <div class="card bg-dark shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0">
+                    <thead class="bg-secondary text-white-50">
+                        <tr>
+                            <th>Tag</th>
+                            <th>Name</th>
+                            <th>Breed</th>
+                            <th>Status</th>
+                            <th class="text-end">Estimated Value (KES)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in details %}
+                        <tr>
+                            <td class="fw-bold">{{ item.tag }}</td>
+                            <td>{{ item.name }}</td>
+                            <td>{{ item.breed }}</td>
+                            <td><span class="badge bg-opacity-25 bg-success text-success">{{ item.status }}</span></td>
+                            <td class="text-end fw-bold">KES {{ "{:,.0f}".format(item.value) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
-
-<div class="row">
-
-    <div class="col-md-4">
-        <div class="card shadow">
-            <div class="card-body">
-                <h6>DCF Valuation</h6>
-                <h4>KSh {{ data.dcf_value }}</h4>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="card shadow">
-            <div class="card-body">
-                <h6>EBITDA Multiple Valuation</h6>
-                <h4>KSh {{ data.ebitda_value }}</h4>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="card shadow bg-light">
-            <div class="card-body">
-                <h6>Terminal Value (Year 3)</h6>
-                <h4>KSh {{ data.terminal_value }}</h4>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<hr class="my-4">
-
-<h4>Valuation Sensitivity</h4>
-
-<label>Discount Rate (%)</label>
-<input type="range" min="10" max="25" value="15" class="form-range" id="discountSlider">
-
-<p>Selected Rate: <span id="rateValue">15</span>%</p>
-
 <script>
-const slider = document.getElementById("discountSlider");
-const rateValue = document.getElementById("rateValue");
+    function generateValuationPDF() {
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // --- LOGO & HEADER ---
+        const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."; 
+        try {
+            doc.addImage(logoBase64, 'PNG', 14, 10, 25, 25); 
+        } catch (e) { console.log("Logo skipped"); }
 
-slider.oninput = function() {
-    rateValue.innerText = this.value;
+        doc.setFontSize(22);
+        doc.setTextColor(45, 106, 79); 
+        doc.text("HERD VALUATION REPORT", 45, 22); 
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text("Arial Logistics | Financial Asset Division", 45, 28);
+        doc.line(14, 38, 196, 38); 
+
+        // --- SUMMARY SECTION ---
+        doc.setFontSize(14);
+        doc.setTextColor(0);
+        doc.text("Total Herd Value: KES {{ '{:,.2f}'.format(total_value) }}", 14, 48);
+        doc.setFontSize(10);
+        doc.text("Date of Valuation: {{ now.strftime('%Y-%m-%d') if now else '2026-03-08' }}", 14, 54);
+
+        // --- DATA TABLE ---
+        var rows = [];
+        {% for item in details %}
+            rows.push([
+                "{{ item.tag }}", 
+                {{ item.name|tojson }}, 
+                "{{ item.breed }}", 
+                "{{ item.status }}", 
+                "KES {{ '{:,.0f}'.format(item.value) }}"
+            ]);
+        {% endfor %}
+
+        doc.autoTable({
+            startY: 65,
+            head: [['Tag', 'Name', 'Breed', 'Status', 'Value (KES)']],
+            body: rows,
+            theme: 'striped',
+            headStyles: { fillColor: [45, 106, 79] },
+            columnStyles: { 4: { halign: 'right' } }
+        });
+
+        // --- SIGNATURE SECTION ---
+        let finalY = doc.lastAutoTable.finalY + 30;
+        const pageHeight = doc.internal.pageSize.height;
+        if (finalY > pageHeight - 40) { doc.addPage(); finalY = 40; }
+
+        doc.line(14, finalY, 80, finalY);
+        doc.text("Financial Auditor Signature", 14, finalY + 5);
+        doc.line(130, finalY, 196, finalY);
+        doc.text("Director, Arial Logistics", 130, finalY + 5);
+
+        doc.save("Njuwan_Farm_Valuation.pdf");
+
+    } catch (error) {
+        alert("Valuation PDF Error: " + error.message);
+    }
 }
 </script>
 

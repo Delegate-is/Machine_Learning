@@ -279,10 +279,34 @@ def yoghurt_dashboard():
     data = yoghurt_profit_analysis()
     return render_template("yoghurt.html", data=data)
 
-@app.route("/valuation")
-def valuation_dashboard():
-    data = farm_valuation()
-    return render_template("valuation.html", data=data)
+@app.route('/valuation')
+def valuation():
+    cows = Cow.query.all()
+    total_value = 0
+    valuation_details = []
+
+    for cow in cows:
+        # Basic valuation logic based on breed and status
+        base_price = 120000 
+        if cow.breed in ['Holstein', 'Ayrshire']:
+            base_price += 30000
+        
+        if cow.status == 'Lactating':
+            base_price += 30000
+        elif cow.status == 'Quarantined' or cow.status == 'Sick':
+            base_price -= 50000
+        
+        total_value += base_price
+        valuation_details.append({
+            'tag': cow.tag_number,
+            'name': cow.name,
+            'value': base_price
+        })
+
+    return render_template('valuation.html', 
+                           total_value=total_value, 
+                           details=valuation_details,
+                           count=len(cows))
 
 @app.route('/add_crop', methods=['GET', 'POST'])
 def add_crop():

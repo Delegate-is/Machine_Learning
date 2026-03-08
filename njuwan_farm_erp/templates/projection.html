@@ -53,5 +53,52 @@ new Chart(ctx, {
     }
 });
 </script>
+<canvas id="revenueGrowthChart" width="400" height="200"></canvas>
+
+<script>
+    const ctx = document.getElementById('revenueGrowthChart').getContext('2d');
+    
+    // Core data from your seeded herd
+    const currentHerd = 30;
+    const avgMilkPerCow = 25; // Liter average from your seed.py logic
+    const pricePerLiter = 50; // Current Kenyan market estimate
+    const growthRate = 0.13; // Based on your 4 active pregnancies
+
+    const labels = ['2026', '2027', '2028', '2029'];
+    
+    // Calculate projections
+    const herdData = labels.map((_, i) => Math.round(currentHerd * Math.pow(1 + growthRate, i)));
+    const revenueData = herdData.map(count => count * avgMilkPerCow * pricePerLiter);
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Herd Size (Cows)',
+                    data: herdData,
+                    borderColor: '#2d6a4f',
+                    backgroundColor: 'rgba(45, 106, 79, 0.1)',
+                    yAxisID: 'y',
+                    fill: true
+                },
+                {
+                    label: 'Daily Revenue (KES)',
+                    data: revenueData,
+                    borderColor: '#ffc107', // Warning yellow to match your dashboard
+                    borderDash: [5, 5],
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            scales: {
+                y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Number of Cows' } },
+                y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Daily Income (KES)' } }
+            }
+        }
+    });
+</script>
 
 {% endblock %}

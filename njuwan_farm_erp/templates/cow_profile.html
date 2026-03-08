@@ -3,40 +3,40 @@
 
 <div class="row mb-4">
     <div class="col-md-4">
-        <div class="card bg-dark border-danger text-white p-3 shadow-sm">
+        <div class="card bg-dark border-danger p-3 shadow-sm">
             <div class="d-flex align-items-center">
                 <div class="rounded-circle bg-danger p-3 me-3">
                     <i class="fas fa-stethoscope text-white"></i>
                 </div>
                 <div>
-                    <h6 class="mb-0 text-muted">Total Health Incidents</h6>
-                    <h3 class="mb-0 text-danger">{{ total_incidents }}</h3>
+                    <h6 class="mb-0 text-white-50">Total Health Incidents</h6>
+                    <h3 class="mb-0 text-white fw-bold">{{ total_incidents }}</h3>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card bg-dark border-warning text-white p-3 shadow-sm">
+        <div class="card bg-dark border-warning p-3 shadow-sm">
             <div class="d-flex align-items-center">
                 <div class="rounded-circle bg-warning p-3 me-3">
                     <i class="fas fa-syringe text-dark"></i>
                 </div>
                 <div>
-                    <h6 class="mb-0 text-muted">Pending Vaccines</h6>
-                    <h3 class="mb-0 text-warning">{{ pending_vaccines }}</h3>
+                    <h6 class="mb-0 text-white-50">Pending Vaccines</h6>
+                    <h3 class="mb-0 text-white fw-bold">{{ pending_vaccines }}</h3>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card bg-dark border-success text-white p-3 shadow-sm">
+        <div class="card bg-dark border-success p-3 shadow-sm">
             <div class="d-flex align-items-center">
                 <div class="rounded-circle bg-success p-3 me-3">
                     <i class="fas fa-baby-carriage text-white"></i>
                 </div>
                 <div>
-                    <h6 class="mb-0 text-muted">Active Pregnancies</h6>
-                    <h3 class="mb-0 text-success">{{ upcoming_calvings }}</h3>
+                    <h6 class="mb-0 text-white-50 text-truncate">Active Pregnancies</h6>
+                    <h3 class="mb-0 text-white fw-bold">{{ upcoming_calvings }}</h3>
                 </div>
             </div>
         </div>
@@ -197,40 +197,90 @@ function generatePDF() {
 }
 
 function generateMedicalPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.setTextColor(45, 106, 79);
-    doc.text("Njuwan Farm: Medical & Vaccination History", 14, 20);
-    
-    let finalY = 30;
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // --- LOGO & HEADER ---
+        const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."; 
+        try {
+            doc.addImage(logoBase64, 'PNG', 14, 10, 25, 25); 
+        } catch (e) { console.log("Logo skipped"); }
 
-    {% for cow in cows %}
-        let medicalRows = [];
-        {% for health in cow.health_records %}
-            medicalRows.push(["Health", "{{ health.date }}", "{{ health.disease }}", "{{ health.treatment }}", "{{ health.vet_name }}"]);
+        doc.setFontSize(22);
+        doc.setTextColor(45, 106, 79); 
+        doc.text("NJUWAN FARM ERP", 45, 22); 
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text("Official Medical Records | Arial Logistics Firm", 45, 28);
+        doc.line(14, 38, 196, 38); 
+
+        let finalY = 48;
+
+        {% for cow in cows %}
+            var currentMedicalRows = []; // Resetting for each cow
+            
+            {% for health in cow.health_records %}
+                currentMedicalRows.push([
+                    "Health", 
+                    "{{ health.date.strftime('%Y-%m-%d') }}", 
+                    {{ health.disease|tojson }}, 
+                    {{ health.treatment|tojson }}, 
+                    {{ health.vet_name|tojson }}
+                ]);
+            {% endfor %}
+
+            {% for vac in cow.vaccinations %}
+                currentMedicalRows.push([
+                    "Vaccine", 
+                    "{{ vac.due_date }}", 
+                    {{ vac.vaccine|tojson }}, 
+                    "Status: {{ vac.status }}", 
+                    "-"
+                ]);
+            {% endfor %}
+
+            if (currentMedicalRows.length > 0) {
+                doc.setFontSize(12);
+                doc.setTextColor(0);
+                doc.text("Cow Tag: {{ cow.tag_number }} ({{ cow.name }})", 14, finalY);
+                
+                doc.autoTable({
+                    startY: finalY + 5,
+                    head: [['Type', 'Date', 'Issue/Vaccine', 'Treatment/Status', 'Vet']],
+                    body: currentMedicalRows,
+                    theme: 'striped',
+                    headStyles: { fillColor: [45, 106, 79] }
+                });
+                
+                finalY = doc.lastAutoTable.finalY + 15;
+            }
+
+            if (finalY > 230) { // Lowered threshold to leave room for signature
+                doc.addPage();
+                finalY = 20;
+            }
         {% endfor %}
-        {% for vac in cow.vaccinations %}
-            medicalRows.push(["Vaccine", "{{ vac.due_date }}", "{{ vac.vaccine }}", "Status: {{ vac.status }}", "-"]);
-        {% endfor %}
 
-        if (medicalRows.length > 0) {
-            doc.setFontSize(12);
-            doc.setTextColor(0);
-            doc.text("Cow: {{ cow.tag_number }} - {{ cow.name }}", 14, finalY);
-            doc.autoTable({
-                startY: finalY + 5,
-                head: [['Type', 'Date', 'Issue/Vaccine', 'Treatment/Status', 'Vet']],
-                body: medicalRows,
-                theme: 'striped',
-                headStyles: { fillColor: [70, 70, 70] }
-            });
-            finalY = doc.lastAutoTable.finalY + 15;
-        }
-        if (finalY > 260) { doc.addPage(); finalY = 20; }
-    {% endfor %}
+        // --- SIGNATURE SECTION ---
+        const pageHeight = doc.internal.pageSize.height;
+        doc.setFontSize(10);
+        doc.setTextColor(0);
+        
+        // Left Side: Veterinary Officer
+        doc.line(14, pageHeight - 30, 80, pageHeight - 30);
+        doc.text("Veterinary Officer Signature", 14, pageHeight - 25);
+        
+        // Right Side: Farm Manager (Arial Logistics)
+        doc.line(130, pageHeight - 30, 196, pageHeight - 30);
+        doc.text("Farm Manager (Arial Logistics)", 130, pageHeight - 25);
 
-    doc.save("Njuwan_Medical_History.pdf");
+        doc.save("Njuwan_Medical_Report.pdf");
+
+    } catch (error) {
+        alert("Report Error: " + error.message);
+    }
 }
+
 </script>
 {% endblock %}
