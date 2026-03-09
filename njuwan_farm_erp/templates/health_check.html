@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-white mb-4">System Diagnostics</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card bg-dark border-{{ 'success' if status.database == 'Online' else 'danger' }} p-3">
+                <h6 class="text-white-50">Database Status</h6>
+                <h4 class="text-white">{{ status.database }}</h4>
+                <small class="text-success">{{ status.cow_count }} Records Found</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark border-{{ 'success' if 'Warning' not in status.pdf_engine else 'warning' }} p-3">
+                <h6 class="text-white-50">PDF Export Engine</h6>
+                <h4 class="text-white">{{ status.pdf_engine }}</h4>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark border-primary p-3 shadow-sm">
+                <h6 class="text-white-50">Data Safety (Backups)</h6>
+                <h4 class="text-white">Active</h4>
+                <small class="text-primary">Last: {{ status.last_backup }}</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

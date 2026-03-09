@@ -24,9 +24,19 @@ from version import increment_version
 from project_state import load_state
 from flask import jsonify
 from flask_migrate import Migrate
+import os
+import glob
+# Email setup for notifications (e.g., calving alerts, health issues)
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 app.config.from_object(Config)
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'ariallogistics@gmail.com'
+app.config['MAIL_PASSWORD'] = 'your-app-password'
+mail = Mail(app)
 
 # 3. Initialize the app with the db instance
 db.init_app(app)
@@ -300,6 +310,8 @@ def valuation():
         valuation_details.append({
             'tag': cow.tag_number,
             'name': cow.name,
+            'breed': cow.breed,   # Add this line
+            'status': cow.status,
             'value': base_price
         })
 
@@ -447,6 +459,61 @@ def toggle_vaccination(vac_id):
     vac.status = "Completed" if vac.status == "Pending" else "Pending"
     db.session.commit()
     return redirect(url_for('cow_profile_list'))
+
+@app.route('/health_check')
+# Logic to trigger alerts
+def check_for_alerts():
+    health_incidents = Cow.query.filter(Cow.status == 'Sick').count()
+    if health_incidents > 5:
+        send_system_alert(
+            "Njuwan ERP: High Health Risk Alert",
+            f"Alert: {health_incidents} cows are currently marked as Sick/Quarantined. Please check the Wellness Overview."
+        )
+def send_system_alert(subject, body):
+    msg = Message(subject, 
+                  sender='kelvinjua903@gmail.com', 
+                  recipients=['ariallogistics@gmail.com'])
+    msg.body = body
+    mail.send(msg)
+    # The fix for your TypeError
+    if health_incidents > 5:
+        send_system_alert(
+            subject="Njuwan ERP: High Health Risk Alert",
+            body=f"Attention: {health_incidents} cows are currently marked as Sick."
+            )
+        
+    return render_template('health_check.html', status=health_status)
+# You can call check_for_alerts() at the end of your dashboard route or set it up as a scheduled task.
+
+@app.route('/health_check')  # Renamed to match your browser
+def health_check():
+    health_status = {
+        "database": "Offline",
+        "cow_count": 0,
+        "pdf_engine": "Ready",
+        "last_backup": "None Found"
+    }
+    
+    try:
+        # Check DB connection for your 30 cows
+        health_status["cow_count"] = Cow.query.count()
+        health_status["database"] = "Online"
+        
+        # TRIGGER ALERT: Pass the 2 required arguments to fix TypeError
+        if health_status["cow_count"] > 0: 
+             send_system_alert("System Check", "Database is active and healthy.")
+    except Exception as e:
+        health_status["database"] = f"Error: {str(e)}"
+
+    # Check for latest backup file
+    backup_dir = os.path.join(app.root_path, 'backups')
+    if os.path.exists(backup_dir):
+        files = glob.glob(os.path.join(backup_dir, '*.db'))
+        if files:
+            latest_file = max(files, key=os.path.getctime)
+            health_status["last_backup"] = os.path.basename(latest_file)
+
+    return render_template('health_check.html', status=health_status)
 
 if __name__ == "__main__":
     with app.app_context():
