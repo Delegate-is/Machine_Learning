@@ -12,78 +12,50 @@ def seed_database():
         db.drop_all()
         db.create_all()
 
-        breeds = ['Holstein', 'Jersey', 'Guernsey', 'Ayrshire', 'Sahiwal']
-        statuses = ['Lactating', 'Dry', 'Quarantined', 'Sick']
-        diseases = ['Mastitis', 'Foot Rot', 'Milk Fever', 'Bloat']
-        feed_types = ['Silage', 'Dairy Meal', 'Napier Grass', 'Hay']
+        # 1. Your Specific Milking Herd
+        milking_cows = [
+            {'name': 'June', 'breed': 'Holstein', 'status': 'Lactating'},
+            {'name': 'Njata', 'breed': 'Jersey', 'status': 'Lactating'},
+            {'name': 'Mariru', 'breed': 'Ayrshire', 'status': 'Lactating'},
+            {'name': 'Mahua', 'breed': 'Friesian', 'status': 'Lactating'},
+            {'name': 'Turi', 'breed': 'Sahiwal', 'status': 'Lactating'},
+            {'name': 'Madam', 'breed': 'Holstein', 'status': 'Lactating'}
+        ]
 
-        print("Adding 30 cows and records...")
-        
-        for i in range(1, 31):
-            # 1. Create Cow
-            tag = f"{i:03d}"
-            cow = Cow(
-                tag_number=tag,
-                name=f"Cow_{tag}",
-                breed=random.choice(breeds),
-                status=random.choice(statuses)
-            )
+        # 2. Add Milking Cows with specific production data
+        for i, data in enumerate(milking_cows):
+            tag = f"M{i+1:02d}"
+            cow = Cow(tag_number=tag, name=data['name'], breed=data['breed'], status=data['status'])
             db.session.add(cow)
-            db.session.flush() # Get cow.id for relationships
+            db.session.flush()
 
-            # 2. Add Milk Records (Last 7 days)
+            # Add 7 days of milk records (higher yields for milking cows)
             for d in range(7):
-                date_point = datetime.now() - timedelta(days=d)
-                # Randomize production between 15L and 35L
-                milk = MilkProduction(
-                    cow_id=cow.id,
-                    litres=round(random.uniform(15.0, 35.0), 2),
-                    date=date_point
-                )
-                db.session.add(milk)
+                db.session.add(MilkProduction(
+                    cow_id=cow.id, 
+                    litres=round(random.uniform(20.0, 35.0), 2), 
+                    date=datetime.now() - timedelta(days=d)
+                ))
 
-            # 3. Add Feed Records (Last 7 days)
-            for d in range(7):
-                date_point = datetime.now() - timedelta(days=d)
-                feed = Feed(
-                    cow_id=cow.id,
-                    f_type=random.choice(feed_types),
-                    qty=round(random.uniform(5.0, 15.0), 1),
-                    date=date_point
-                )
-                db.session.add(feed)
+        # 3. Add 4 Almost Calving Heifers (High Valuation)
+        for i in range(1, 5):
+            cow = Cow(tag_number=f"H{i:02d}", name=f"Heifer_{i}", breed='Friesian', status='Pregnant')
+            db.session.add(cow)
+            db.session.flush()
+            # Add breeding record to show "Almost Calving"
+            db.session.add(Breeding(
+                cow_id=cow.id,
+                insemination_date=datetime.now() - timedelta(days=250), # 9 months ago
+                bull="Elite_Bull_X",
+                expected_calving=datetime.now() + timedelta(days=random.randint(10, 30))
+            ))
 
-            # 4. Randomly add Health/Breeding records to trigger "Wellness Overview"
-            if i % 5 == 0:
-                health = HealthRecord(
-                    cow_id=cow.id,
-                    disease=random.choice(diseases),
-                    treatment="Antibiotics and rest",
-                    vet_name="Dr. Kariuki",
-                    date=datetime.now() - timedelta(days=random.randint(1, 10))
-                )
-                db.session.add(health)
-
-            if i % 7 == 0:
-                breeding = Breeding(
-                    cow_id=cow.id,
-                    insemination_date=datetime.now() - timedelta(days=random.randint(30, 100)),
-                    bull="Elite_Bull_X",
-                    expected_calving=datetime.now() + timedelta(days=random.randint(100, 250))
-                )
-                db.session.add(breeding)
-
-            if i % 10 == 0:
-                vac = Vaccination(
-                    cow_id=cow.id,
-                    vaccine="Foot and Mouth",
-                    due_date=datetime.now() + timedelta(days=random.randint(5, 20)),
-                    status="Pending"
-                )
-                db.session.add(vac)
+        # 4. Add 6 Young Calves
+        for i in range(1, 7):
+            db.session.add(Cow(tag_number=f"C{i:02d}", name=f"Calf_{i}", breed='Jersey', status='Young'))
 
         db.session.commit()
-        print("Success! 30 cows with milk, feed, and health records added.")
-
+        print(f"Success! Seeded 16 animals: {len(milking_cows)} milking, 4 heifers, 6 calves.")
+        
 if __name__ == "__main__":
     seed_database()

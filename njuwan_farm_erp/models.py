@@ -56,8 +56,10 @@ class Cow(db.Model):
     # ... other fields ...
     # Advanced Tracking Fields
     weight_kg = db.Column(db.Float) # Useful for health monitoring
-    status = db.Column(db.String(50), default="Active") # Active, Quarantined, Sold, Dry, Lactating
-
+    # 1. RENAME the actual column in the database
+    # We use "status" as the DB name, but _status as the Python variable
+    _status = db.Column("status", db.String(50), default="Lactating")
+    
     @property
     def age_in_years(self):
         from datetime import date
@@ -65,6 +67,31 @@ class Cow(db.Model):
             return (date.today() - self.date_of_birth).days // 365
         return "Unknown"
 
+    @property
+    def status(self):
+        if self.name and "Calf" in self.name:
+            return "Young"
+
+        latest = Breeding.query.filter_by(cow_id=self.id).order_by(Breeding.id.desc()).first()
+    
+        if latest and latest.expected_calving:
+            from datetime import datetime
+            # FIX: Convert now to a date object to match expected_calving
+            today = datetime.now().date()
+            days_to_calving = (latest.expected_calving - today).days
+        
+            if 0 < days_to_calving <= 60:
+                return "Dry"
+            elif days_to_calving > 60:
+                return "Pregnant"
+
+        # Use _status to avoid the recursion loop we saw earlier
+        return self._status or "Lactating"
+
+    @status.setter
+    def status(self, value):
+        self._status = value
+    
     # Define the relationship ONLY ONCE. 
     # backref="cow" automatically creates a 'cow' attribute on the Feed object.
     feed_records = db.relationship("Feed", backref="cow", lazy=True)

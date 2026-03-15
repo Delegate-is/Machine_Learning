@@ -77,27 +77,36 @@
                         <td>{{ cow.name }}</td>
                         <td>{{ cow.breed }}</td>
                         <td>
-                            <span class="badge {% if cow.status|lower == 'lactating' %}bg-success{% else %}bg-secondary{% endif %}">
-                                {{ cow.status }}
-                            </span>
-                        </td>
-                        <td>
-                            {% for health in cow.health_records %}
-                                {{ health.disease }} ({{ health.date.strftime('%d/%m') }})<br>
-                            {% else %} Clean Bill {% endfor %}
-                        </td>
-                        <td>
-                            {% for breed in cow.breeding_records %}
-                                {% if breed.days_remaining is not none %}
-                                    Due: {{ breed.expected_calving }} (Days: {{ breed.days_remaining }})
-                                {% else %}
-                                    Not Expecting
-                                {% endif %}
-                            {% else %} Not Expecting {% endfor %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
+                            {# The color changes based on the dynamic status property #}
+                            <span class="badge 
+                            {% if cow.status == 'Dry' %}bg-warning text-dark
+                            {% elif cow.status == 'Pregnant' %}bg-primary
+                            {% elif cow.status == 'Lactating' %}bg-success
+                            {% elif cow.status == 'Young' %}bg-info
+                            {% else %}bg-secondary{% endif %}">
+                            {{ cow.status }}
+                        </span>
+                    </td>
+                    <td>
+                        {# Checking for medical records or health incidents #}
+                        {% if cow.health_records %}
+                            <span class="text-danger"><i class="fas fa-exclamation-triangle"></i> Review Records</span>
+                        {% else %}
+                            <span class="text-muted">Clean Bill</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {# This uses your existing logic for heifers like H01-H04 #}
+                        {% set latest_breeding = cow.breeding_records|last %}
+                        {% if latest_breeding and latest_breeding.expected_calving %}
+                            Due: {{ latest_breeding.expected_calving.strftime('%Y-%m-%d') }}
+                        {% else %}
+                            <span class="text-muted">Not Expecting</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
             </table>
         </div>
     </div>
