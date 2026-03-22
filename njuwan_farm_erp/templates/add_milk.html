@@ -1,38 +1,220 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h2>Add Milk Record</h2>
+<div class="container fade-in">
+    <h2 class="text-success">Add Milk Record</h2>
 
-<div class="mb-4">
-    <img src="https://source.unsplash.com/1200x400/?milk,dairy" class="img-fluid rounded shadow">
+    <div class="mb-4">
+        <img src="https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&w=1200&q=80" class="img-fluid rounded shadow" alt="Dairy Farm">
+    </div>
+
+    <div class="card p-4 mb-5 shadow border-secondary bg-dark text-white">
+        <form action="/add_milk" method="POST">
+            <div class="mb-3">
+                <label class="form-label text-success fw-bold">Select Cow</label>
+                <select class="form-select bg-dark text-white border-secondary" name="cow_id" required>
+                    {% for cow in cows %}
+                        {% set is_blocked = false %}
+                        {% for record in cow.health_records %}
+                            {% if record.status == 'Under Treatment' %}{% set is_blocked = true %}{% endif %}
+                        {% endfor %}
+                        <option value="{{ cow.id }}">
+                            {{ cow.name }} ({{ cow.tag_number }}) 
+                            {% if is_blocked %}⚠️ WITHDRAWAL ACTIVE{% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label text-success small fw-bold">Litres Produced</label>
+                    <input type="number" step="0.1" name="litres" class="form-control bg-dark text-white border-secondary" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label text-success small fw-bold">Milking Session</label>
+                    <select class="form-select bg-dark text-white border-secondary" name="session">
+                        <option value="AM">Morning (AM)</option>
+                        <option value="NOON">Noon (NOON)</option>
+                        <option value="PM">Evening (PM)</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label text-success small fw-bold">Milk Temp (°C)</label>
+                    <input type="number" step="0.1" name="temperature" class="form-control bg-dark text-white border-secondary" placeholder="Optional">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success w-100 fw-bold">Save Production Record</button>
+        </form>
+    </div>
+
+    <h3 class="text-white">Recent Milk Entries</h3>
+    <div class="table-responsive mb-5">
+        <table class="table table-dark table-striped shadow-sm mt-3">
+            <thead>
+                <tr class="table-success text-dark">
+                    <th>Time</th><th>Cow</th><th>Litres</th><th>Session</th><th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in recent_records %}
+                <tr>
+                    <td>{{ record.date.strftime('%H:%M') if record.date else 'N/A' }}</td>
+                    <td class="fw-bold">{{ record.cow.name }}</td>
+                    <td class="text-success fw-bold">{{ record.litres }} L</td>
+                    <td><span class="badge bg-secondary">{{ record.session }}</span></td>
+                    <td>
+                        <form action="{{ url_for('delete_milk', record_id=record.id) }}" method="POST">
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="text-white">Weekly Production Matrix</h3>
+        <button class="btn btn-primary shadow" onclick="downloadPDF()">
+            <i class="bi bi-file-earmark-pdf"></i> Download Weekly Report
+        </button>
+    </div>
+
+    <div id="printable-matrix" class="bg-dark p-4 rounded shadow-sm border border-secondary">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                <h1 class="text-success fw-bold m-0">NJUWAN FARM ERP</h1>
+                <p style="margin: 0; color: #adb5bd;">Weekly Production & Revenue Report | Nyeri, Kenya</p>
+            </div>
+
+            <div class="text-end d-flex align-items-center bg-secondary bg-opacity-10 p-2 rounded">
+                <div class="me-2">
+                    <div class="h5 m-0 fw-bold text-white">{{ weather.temp if weather else '24' }}°C</div>
+                    <small class="text-info text-capitalize">{{ weather.desc if weather else 'Sunny' }}</small>
+                </div>
+                <span class="fs-2">
+                    {% if weather and 'rain' in weather.desc.lower() %}
+                        <i class="bi bi-cloud-rain-fill text-info"></i>
+                    {% elif weather and 'cloud' in weather.desc.lower() %}
+                        <i class="bi bi-cloud-sun-fill text-warning"></i>
+                    {% else %}
+                        <i class="bi bi-sun-fill text-warning"></i>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm text-center align-middle border-secondary">
+                <thead class="table-dark">
+                    <tr>
+                        <th rowspan="2" class="align-middle border-secondary text-success">Cow</th>
+                        {% for day in week_dates %}
+                        <th colspan="3" class="border-secondary small">{{ day.strftime('%a %d') }}</th>
+                        {% endfor %}
+                    </tr>
+                    <tr class="small border-secondary">
+                        {% for day in week_dates %}
+                        <th class="border-secondary">AM</th>
+                        <th class="border-secondary">PM</th>
+                        <th class="border-secondary">EV</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody class="bg-dark">
+                    {% for cow_name, dates in matrix.items() %}
+                    <tr>
+                        <td class="fw-bold text-success border-secondary text-start">{{ cow_name }}</td>
+                        {% for day in week_dates %}
+                            <td style="color: #ffffff !important; font-weight: 700;" class="{{ 'bg-success bg-opacity-25' if dates[day]['AM'] > 0 else 'text-muted opacity-50' }}">
+                                {{ dates[day]['AM'] or '-' }}
+                            </td>
+                            <td style="color: #ffffff !important; font-weight: 700;" class="{{ 'bg-success bg-opacity-10' if dates[day]['PM'] > 0 else 'text-muted opacity-50' }}">
+                                {{ dates[day]['PM'] or '-' }}
+                            </td>
+                            <td style="color: #ffffff !important; font-weight: 700;" class="{{ 'bg-success bg-opacity-25' if dates[day]['EV'] > 0 else 'text-muted opacity-50' }}">
+                                {{ dates[day]['EV'] or '-' }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="fw-bold">
+                    <tr class="bg-primary text-white">
+                        <td class="text-start border-primary">DAILY TOTAL</td>
+                        {% for day in week_dates %}
+                        <td colspan="3" class="text-center border-primary py-2">
+                            {{ "%.1f"|format(daily_totals[day]['AM'] + daily_totals[day]['PM'] + daily_totals[day]['EV']) }} L
+                            {% if trends[day] == 'up' %}
+                                <i class="bi bi-arrow-up-right-circle-fill text-white ms-1"></i>
+                            {% elif trends[day] == 'down' %}
+                                <i class="bi bi-arrow-down-right-circle-fill text-white ms-1"></i>
+                            {% endif %}
+                        </td>       
+                        {% endfor %}
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
 </div>
 
-<form action="/add_milk" method="POST">
-    <div class="mb-3">
-        <label class="form-label">Select Cow</label>
-        <select class="form-control" name="cow_id" required>
-            {% for cow in cows %}
-            <option value="{{ cow.id }}">{{ cow.name }} ({{ cow.tag_number }})</option>
-            {% endfor %}
-        </select>
-    </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+function downloadPDF() {
+    const element = document.getElementById('printable-matrix');
+    
+    const opt = {
+        margin: [0.5, 0.5],
+        filename: `Njuwan_Report_${new Date().toISOString().slice(0,10)}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+            scale: 2, 
+            useCORS: true,
+            // THIS IS THE KEY: Re-style the clone before it's "printed"
+            onclone: (clonedDoc) => {
+                const report = clonedDoc.getElementById('printable-matrix');
+                report.style.backgroundColor = 'white';
+                report.style.color = 'black';
+                
+                // Force all table text to black so it shows up on white
+                const cells = report.querySelectorAll('td, th, h3, h4, small');
+                cells.forEach(cell => cell.style.setProperty('color', 'black', 'important'));
+            }
+        },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+    };
 
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <label class="form-label">Litres Produced</label>
-            <input type="number" step="0.1" name="litres" class="form-control" required>
-        </div>
-        <div class="col-md-6 mb-3">
-            <label class="form-label">Milking Session</label>
-            <select class="form-control" name="session">
-                <option value="AM">Morning (AM)</option>
-                <option value="NOON">Noon (NOON)</option>
-                <option value="PM">Evening (PM)</option>
-            </select>
-            <input type="number" step="0.1" name="temperature" placeholder="Milk Temp (°C)" class="form-control">
-        </div>
-    </div>
-    <button type="submit" class="btn btn-success">Save Production Record</button>
-</form>
+    html2pdf().set(opt).from(element).save();
+}
+</script>
+
+<style>
+    .fade-in { animation: fadeIn 0.6s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); }
+    .table td { border-color: #444 !important; }
+    @media print {
+        /* Hide the dark UI elements */
+        #printable-matrix.bg-dark {
+            background-color: white !important;
+            color: black !important;
+            box-shadow: none !important;
+        }
+    
+        /* Ensure the daily totals (37.0 L, 53.0 L) are visible */
+        .bg-primary, .table-dark {
+            background-color: #f8f9fa !important;
+            color: black !important;
+            border: 1px solid #ddd !important;
+        }
+
+        /* Keep your cow names and milk values sharp */
+        .text-success {
+            color: #198754 !important;
+        }
+    }
+</style>
 
 {% endblock %}

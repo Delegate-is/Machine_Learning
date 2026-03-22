@@ -106,13 +106,18 @@ class HealthRecord(db.Model):
     disease = db.Column(db.String(100))
     treatment = db.Column(db.String(200))
     vet_name = db.Column(db.String(100))
+    cost = db.Column(db.Float)
     date = db.Column(db.Date, default=datetime.utcnow) # Automatically stamps entry date
-
+    status = db.Column(db.String(20), default="Under Treatment")
+    clearance_date = db.Column(db.DateTime, nullable=True)
+    
 class Vaccination(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     cow_id = db.Column(db.Integer, db.ForeignKey('cows.id'))
     vaccine = db.Column(db.String(100))
     due_date = db.Column(db.Date)
+    administered_by = db.Column(db.String(100))
+    next_due_date = db.Column(db.Date)
     status = db.Column(db.String(20), default="Pending") # Matches your HTML badges
 
 class Breeding(db.Model):
@@ -151,8 +156,6 @@ class MilkProduction(db.Model):
     def is_quality_standard(self):
         # Example: Normal fresh milk temp is usually 35-38°C at milking
         return 34.0 <= self.temperature <= 39.0
-
-
 
 # ===============================
 # FEED RECORDS
@@ -244,3 +247,22 @@ class FarmValuation(db.Model):
     projected_profit = db.Column(db.Float)
 
     valuation_date = db.Column(db.DateTime, default=datetime.utcnow)
+    
+class CalfHealth(db.Model):
+    __tablename__ = "calf_health"
+    id = db.Column(db.Integer, primary_key=True)
+    calf_id = db.Column(db.Integer, db.ForeignKey('cows.id'), nullable=False)
+    colostrum_litres = db.Column(db.Float, default=0.0)
+    colostrum_time = db.Column(db.DateTime) # Critical within 2 hours
+    navel_dipped = db.Column(db.Boolean, default=False)
+    vitamin_booster = db.Column(db.Boolean, default=False)
+    check_date = db.Column(db.DateTime, default=datetime.utcnow)
+    
+class Inventory(db.Model):
+    __tablename__ = "inventory"
+    id = db.Column(db.Integer, primary_key=True)
+    item_name = db.Column(db.String(100), unique=True, nullable=False)
+    quantity = db.Column(db.Float, default=0.0)
+    unit = db.Column(db.String(20)) # e.g., 'Litres', 'Kg'
+    min_threshold = db.Column(db.Float, default=5.0) # Alert if below this
+    last_updated = db.Column(db.DateTime, default=datetime.utcnow)

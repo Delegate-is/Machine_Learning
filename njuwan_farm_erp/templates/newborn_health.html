@@ -1,0 +1,28 @@
+<h3>Newborn Immunity Checklist (First 24 Hours)</h3>
+<div class="row">
+    {% for calf in calves %}
+    <div class="col-md-4 mb-3">
+        <div class="card border-primary">
+            <div class="card-body">
+                <h5 class="card-title">{{ calf.name }} <small class="text-muted">({{ calf.tag_number }})</small></h5>
+                <hr>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Colostrum (4L)
+                        <span class="badge bg-danger rounded-pill">Pending</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Navel Disinfected (Iodine)
+                        <input type="checkbox" class="form-check-input">
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Weight Recorded
+                        <span class="badge bg-success rounded-pill">{{ calf.weight_kg }}kg</span>
+                    </li>
+                </ul>
+                <button class="btn btn-sm btn-outline-primary mt-3 w-100">Save Health Update</button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>

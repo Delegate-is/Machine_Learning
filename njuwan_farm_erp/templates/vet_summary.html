@@ -1,0 +1,65 @@
+<h2>Professional Services: {{ vet_name }}</h2>
+<div class="alert alert-info">Total Investment in Veterinary Care: <strong>KES {{ "{:,.2f}".format(total_cost) }}</strong></div>
+
+<h4>Clinical Incidents</h4>
+<table class="table table-bordered">
+    <thead class="table-light">
+        <tr>
+            <th>Date</th>
+            <th>Cow</th>
+            <th>Diagnosis</th>
+            <th>Treatment</th>
+            <th>Cost (KES)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in incidents %}
+        <tr>
+            <td>{{ record.date.strftime('%d/%m/%Y') }}</td>
+            <td>{{ record.cow.name }}</td>
+            <td><span class="badge bg-danger">{{ record.diagnosis }}</span></td>
+            <td>{{ record.treatment }}</td>
+            <td>{{ "{:,.2f}".format(record.cost) }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h4>Vaccination Log</h4>
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Vaccine</th>
+            <th>Cow</th>
+            <th>Next Due</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for vax in vaccinations %}
+        <tr>
+            <td>{{ vax.date_administered.strftime('%d/%m/%Y') }}</td>
+            <td>{{ vax.vaccine_name }}</td>
+            <td>{{ vax.cow.name }}</td>
+            <td>{{ vax.next_due_date.strftime('%d/%m/%Y') }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% for record in incidents %}
+<tr>
+    <td>{{ record.cow.name }}</td>
+    <td>{{ record.diagnosis }}</td>
+    <td>
+        {% if record.status == 'Under Treatment' %}
+            <form action="{{ url_for('clear_treatment', record_id=record.id) }}" method="POST">
+                <button class="btn btn-warning btn-sm">Complete Treatment (Start 72h Clock)</button>
+            </form>
+        {% elif record.clearance_date and record.clearance_date > today %}
+            <span class="badge bg-info">Withdrawal Ends: {{ record.clearance_date.strftime('%d/%m %H:%M') }}</span>
+        {% else %}
+            <span class="badge bg-success">Safe for Sale</span>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}

@@ -1,0 +1,41 @@
+<h3>Upcoming Calvings (Next 30 Days)</h3>
+<table class="table table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Cow Name</th>
+            <th>Expected Date</th>
+            <th>Days Left</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in calvings %}
+        <tr>
+            <td><strong>{{ record.cow.name }}</strong></td>
+            <td>{{ record.expected_calving.strftime('%d/%m/%Y') }}</td>
+            <td>
+                <span class="badge bg-warning text-dark">
+                    {{ (record.expected_calving - today).days }} Days
+                </span>
+            </td>
+            <td>
+                <form action="{{ url_for('confirm_calving', breeding_id=record.id) }}" method="POST" class="row g-2">
+                    <div class="col-auto">
+                        <input type="text" name="calf_name" class="form-control form-control-sm" placeholder="Calf Name" required>
+                    </div>
+                    <div class="col-auto">
+                        <input type="number" step="0.1" name="calf_weight" class="form-control form-control-sm" placeholder="Weight (Kg)">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-success btn-sm">Confirm Birth</button>
+                    </div>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="4" class="text-center text-muted">No cows due in the next 30 days.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

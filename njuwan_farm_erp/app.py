@@ -8,12 +8,13 @@ with app.app_context():
     db.create_all()
     print("Database tables refreshed with new relationships!")"""
 # flask --app app run --debug
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from config import Config
 from database import db
 from datetime import datetime, timedelta
 from datetime import date
-from models import MilkProduction, Transaction, Cow, Vaccination, Breeding, Crop, Feed, HealthRecord
+from collections import defaultdict
+from models import MilkProduction, Transaction, Cow, Vaccination, Breeding, Crop, Feed, HealthRecord, Inventory, CalfHealth
 from analytics import monthly_milk_data, revenue_vs_expense, cow_profitability # crop_roi_analysis
 from projection import three_year_projection
 from analytics import feed_efficiency_model
@@ -37,6 +38,7 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'ariallogistics@gmail.com'
 app.config['MAIL_PASSWORD'] = 'your-app-password'
 mail = Mail(app)
+app.secret_key = 'dev-key-njuwan-farm-2026' # Add this line!
 
 # 3. Initialize the app with the db instance
 db.init_app(app)
@@ -77,6 +79,28 @@ def dashboard():
 
 from datetime import date, timedelta
 from sqlalchemy import func
+
+import requests # Add this at the very top
+
+def get_weather():
+    # Use your actual API Key here
+    api_key = "d8416cb9184ae71b2fa72f263607bd10"
+    city = "Nyeri"
+    # unit=metric gives us Celsius
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
+    
+    try:
+        response = requests.get(url, timeout=3) # Timeout prevents app from hanging
+        data = response.json()
+        if data.get("main"):
+            return {
+                "temp": round(data["main"]["temp"]),
+                "desc": data["weather"][0]["description"].capitalize(),
+                "icon": data["weather"][0]["icon"]
+            }
+    except Exception as e:
+        print(f"Weather error: {e}")
+    return None
 
 @app.route('/')
 def dashboard():
@@ -216,19 +240,121 @@ def add_cow():
 @app.route('/add_milk', methods=['GET', 'POST'])
 def add_milk():
     if request.method == 'POST':
-        milk = MilkProduction(
-            cow_id=request.form.get("cow_id"),
-            litres=float(request.form.get("litres")),
-            session=request.form.get("session"), # AM/PM
-            date=datetime.utcnow()
-        )
-        db.session.add(milk)
-        db.session.commit()
-        return redirect('/')
+        cow_id = request.form.get('cow_id')
+        now = datetime.now()
+
+        # 1. THE SAFETY CHECK (Withdrawal Logic)
+        # Checks if cow is 'Under Treatment' OR within the 72h clearance window
+        withdrawal_active = HealthRecord.query.filter(
+            HealthRecord.cow_id == cow_id,
+            (HealthRecord.status == 'Under Treatment') | (HealthRecord.clearance_date > now)
+        ).first()
+
+        if withdrawal_active:
+            if withdrawal_active.status == 'Under Treatment':
+                msg = "Safety Block: This cow is currently under active medical treatment."
+            else:
+                # Calculate remaining hours for the alert
+                time_left = withdrawal_active.clearance_date - now
+                hours = int(time_left.total_seconds() // 3600)
+                msg = f"Safety Block: Milk withdrawal period active. {hours} hours remaining."
+            
+            flash(msg, "danger")
+            return redirect(url_for('add_milk'))
+
+        # 2. THE SAVE LOGIC (Original Code)
+        try:
+            milk = MilkProduction(
+                cow_id=cow_id,
+                litres=float(request.form.get("litres") or 0.0),
+                session=request.form.get("session"), 
+                date=datetime.now() # Using local time for Kenyan records
+            )
+            db.session.add(milk)
+            db.session.commit()
+            flash("Milk record saved successfully!", "success")
+            return redirect('/')
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error saving record: {str(e)}", "danger")
+            return redirect(url_for('add_milk'))
+
+    # GET logic: Only show records for cows NOT currently under withdrawal
+    # We find IDs of cows under treatment first
+    unsafe_cow_ids = [r.cow_id for r in HealthRecord.query.filter_by(status='Under Treatment').all()]
+    
+    # Then we fetch records, excluding those IDs
+    recent_records = MilkProduction.query.filter(
+        ~MilkProduction.cow_id.in_(unsafe_cow_ids)
+    ).order_by(MilkProduction.date.desc()).limit(10).all()
+    
+    # GET Logic: 7-Day Matrix
+    today = datetime.now().date()
+    week_dates = [today - timedelta(days=i) for i in range(7)]
+    
+    # Fetch all records for the last 7 days
+    records = MilkProduction.query.filter(MilkProduction.date >= (today - timedelta(days=7))).all()
+    
+    # matrix[cow_name][date][session] = litres
+    matrix = defaultdict(lambda: defaultdict(lambda: defaultdict(float)))
+    # daily_totals[date][session] = sum_of_all_cows
+    daily_totals = defaultdict(lambda: defaultdict(float))
+    
+    for r in records:
+        day = r.date.date()
+        # Session mapping (AM, PM, EV)
+        if r.session in ['Morning', 'AM']: col = 'AM'
+        elif r.session in ['NOON', 'Lunch', 'PM']: col = 'PM'
+        elif r.session in ['Evening', 'EV']: col = 'EV'
+        else: col = 'PM'
+        
+        matrix[r.cow.name][day][col] += r.litres
+        daily_totals[day][col] += r.litres # Add to the daily sum
+    
+    # Create a trends dictionary: trends[day] = 'up', 'down', or 'stable'
+    trends = {}
+    for i in range(len(week_dates) - 1):
+        current_day = week_dates[i]
+        previous_day = week_dates[i+1] # week_dates is [today, yesterday, ...]
+        
+        current_total = sum(daily_totals[current_day].values())
+        previous_total = sum(daily_totals[previous_day].values())
+        
+        if current_total > previous_total:
+            trends[current_day] = 'up'
+        elif current_total < previous_total:
+            trends[current_day] = 'down'
+        else:
+            trends[current_day] = 'stable'
+    
+    weather_data = get_weather()
+    # Temporarily force fake data to test the UI
+    # weather_data = {"temp": 24, "desc": "Sunny in Nyeri", "icon": "01d"}
     
     cows = Cow.query.all()
-    return render_template('add_milk.html', cows=cows)
+    return render_template('add_milk.html', 
+                           cows=cows, 
+                           matrix=matrix, 
+                           week_dates=week_dates,
+                           cow_names=sorted(matrix.keys()),
+                           recent_records=recent_records,
+                           daily_totals=daily_totals,
+                           now=today,
+                           trends=trends,
+                           weather=weather_data)
 
+@app.route('/delete_milk/<int:record_id>', methods=['POST'])
+def delete_milk(record_id):
+    record = MilkProduction.query.get_or_404(record_id)
+    try:
+        db.session.delete(record)
+        db.session.commit()
+        flash("Record deleted successfully.", "info")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error deleting record: {str(e)}", "danger")
+    
+    return redirect(url_for('add_milk'))
 
 # ======================
 # ADD TRANSACTION
@@ -515,7 +641,38 @@ def health_check():
 
     return render_template('health_check.html', status=health_status)
 
+# --- FIX 1: Consolidated Calving Logic ---
+@app.route('/confirm_calving/<int:breeding_id>', methods=['POST'])
+def confirm_calving(breeding_id):
+    breeding_record = Breeding.query.get_or_404(breeding_id)
+    mother = Cow.query.get(breeding_record.cow_id)
+    
+    # Update Mother
+    mother.status = 'Lactating'
+    
+    # Create Calf
+    new_tag = f"C-{mother.name.upper()}-{datetime.now().strftime('%y%m%d')}"
+    new_calf = Cow(
+        tag_number=new_tag,
+        name=request.form.get("calf_name") or f"Calf of {mother.name}",
+        breed=mother.breed,
+        status='Young',
+        weight_kg=float(request.form.get("calf_weight") or 0.0)
+    )
+    db.session.add(new_calf)
+    
+    # Inventory Auto-Deduct
+    deduct_inventory("Iodine", 0.05)
+    if request.form.get("hand_raised"):
+        deduct_inventory("Milk Replacer", 2.0)
+    
+    db.session.delete(breeding_record) 
+    db.session.commit()
+    flash(f"Success! {new_calf.name} recorded and inventory updated.", "success")
+    return redirect(url_for('dashboard'))
+
 if __name__ == "__main__":
+    
     with app.app_context():
         db.create_all() # Ensures tables exist
     app.run(debug=True)
